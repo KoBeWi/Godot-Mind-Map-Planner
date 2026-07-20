@@ -1,16 +1,31 @@
 [gd_scene format=3 uid="uid://c3hsdtwaq6jig"]
 
-[ext_resource type="Script" uid="uid://btpjyefksrvnx" path="res://addons/MindMapPlanner/MindMapNode.gd" id="1_1t6f1"]
+[ext_resource type="Script" uid="uid://btpjyefksrvnx" path="res://addons/MindMapPlanner/MindMapNode.gd" id="1_jsr75"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_epqjv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hdhy8"]
 
 [node name="MindMapNode" type="PanelContainer" unique_id=1604110263]
 offset_right = 211.0
 offset_bottom = 41.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_epqjv")
-script = ExtResource("1_1t6f1")
+script = ExtResource("1_jsr75")
 
 [node name="Label" type="Label" parent="." unique_id=1426589713]
+unique_name_in_owner = true
 layout_mode = 2
 text = "New Node"
 horizontal_alignment = 1
+
+[node name="LineEdit" type="LineEdit" parent="." unique_id=255825562]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_hdhy8")
+text = "Test"
+alignment = 1
+
+[connection signal="editing_toggled" from="LineEdit" to="." method="_on_line_edit_editing_toggled"]
+[connection signal="focus_exited" from="LineEdit" to="." method="_end_edit"]
+[connection signal="text_submitted" from="LineEdit" to="." method="_on_line_edit_text_submitted"]

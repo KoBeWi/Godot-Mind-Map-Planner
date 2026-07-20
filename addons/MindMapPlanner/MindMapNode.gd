@@ -1,6 +1,9 @@
 @tool
 extends PanelContainer
 
+@onready var label: Label = %Label
+@onready var line_edit: LineEdit = %LineEdit
+
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
 var dragging_active: bool
@@ -15,10 +18,17 @@ func _gui_input(event: InputEvent) -> void:
 		if mb.button_index != MOUSE_BUTTON_LEFT:
 			return
 		
-		if mb.pressed and not mb.double_click:
-			dragging_from = mb.global_position
-			dragging_origin = position
-			try_select = true
+		if mb.pressed:
+			if mb.double_click:
+				line_edit.text = label.text
+				label.hide()
+				line_edit.show()
+				line_edit.edit()
+				line_edit.select_all()
+			else:
+				dragging_from = mb.global_position
+				dragging_origin = position
+				try_select = true
 		elif not mb.pressed:
 			dragging_from = Vector2.INF
 			dragging_active = false
@@ -38,3 +48,20 @@ func _gui_input(event: InputEvent) -> void:
 		dragging_active = true
 		try_select = false
 		position = dragging_origin + (mm.global_position - dragging_from)
+
+func _end_edit(accepted := true) -> void:
+	if not line_edit.visible:
+		return
+	
+	if accepted:
+		label.text = line_edit.text
+	
+	label.show()
+	line_edit.hide()
+
+func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
+	if not toggled_on:
+		_end_edit(not Input.is_action_pressed(&"ui_cancel"))
+
+func _on_line_edit_text_submitted(new_text: String) -> void:
+	_end_edit()
