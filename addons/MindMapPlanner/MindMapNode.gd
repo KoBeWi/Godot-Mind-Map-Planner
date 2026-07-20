@@ -1,8 +1,13 @@
 @tool
-extends PanelContainer
+extends MarginContainer
+
+enum Shape{ CIRCLE, OVAL, RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB}
 
 @onready var label: Label = %Label
 @onready var line_edit: LineEdit = %LineEdit
+
+var shape := Shape.RECT
+var color := Color.WHITE
 
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
@@ -11,6 +16,20 @@ var dragging_active: bool
 var try_select: bool
 
 signal selected
+
+func get_data() -> Dictionary:
+	var data: Dictionary
+	data.position = position
+	data.text = label.text
+	data.color = color.to_html(false)
+	return data
+
+func set_data(data: Dictionary):
+	var pos: String = data["position"].substr(1)
+	position.x = pos.get_slice(",", 0).to_float()
+	position.y = pos.get_slice(",", 1).to_float()
+	label.text = data["text"]
+	color = Color(data["color"])
 
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
@@ -48,6 +67,11 @@ func _gui_input(event: InputEvent) -> void:
 		dragging_active = true
 		try_select = false
 		position = dragging_origin + (mm.global_position - dragging_from)
+
+func _draw() -> void:
+	match shape:
+		Shape.RECT:
+			draw_rect(Rect2(Vector2(), size), color)
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:
