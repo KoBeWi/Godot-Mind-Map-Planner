@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://bj0an0kogyscp"]
+
+[ext_resource type="Script" uid="uid://bvecrq1nv8uwx" path="res://addons/MindMapPlanner/EditorTexture.gd" id="1_54pab"]
+[ext_resource type="Script" uid="uid://dyjdl348y6pt4" path="res://addons/MindMapPlanner/MindMap.gd" id="1_eaywk"]
+
+[sub_resource type="ImageTexture" id="ImageTexture_43nvq"]
+script = ExtResource("1_54pab")
+icon_name = &"Add"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_43nvq"]
+bg_color = Color(0, 0, 0, 0.5019608)
+
+[node name="MindMap" type="EditorDock" unique_id=550237809]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+icon_name = &"AtlasTexture"
+script = ExtResource("1_eaywk")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1140561842]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=6214228]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1075257417]
+layout_mode = 2
+text = "Add Node"
+icon = SubResource("ImageTexture_43nvq")
+
+[node name="CheckBox" type="CheckBox" parent="VBoxContainer/HBoxContainer" unique_id=1725210947]
+layout_mode = 2
+text = "Connect to Previous"
+
+[node name="CheckBox2" type="CheckBox" parent="VBoxContainer/HBoxContainer" unique_id=1214919024]
+layout_mode = 2
+text = "Copy Last Style"
+
+[node name="Canvas" type="Panel" parent="VBoxContainer" unique_id=44180881]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NodeTransform" type="Node2D" parent="VBoxContainer/Canvas" unique_id=1549746674]
+unique_name_in_owner = true
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/Canvas" unique_id=2026989681]
+layout_mode = 0
+offset_top = 27.0
+offset_right = 107.0
+offset_bottom = 27.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_43nvq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=11973182]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer" unique_id=2068977014]
+layout_mode = 2
+text = "Node Options"
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer" unique_id=882578155]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=639663187]
+layout_mode = 2
+text = "Text"
+
+[node name="Label6" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=1830032423]
+layout_mode = 2
+text = "Shape"
+
+[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=573196061]
+layout_mode = 2
+text = "Fill Color"
+
+[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=1258827091]
+layout_mode = 2
+text = "Border Color"
+
+[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=937705908]
+layout_mode = 2
+text = "Text Color"
+
+[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=269358707]
+layout_mode = 2
+text = "Size"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=1966239208]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2" unique_id=671945319]
+layout_mode = 2
+text = "Connection Options"
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2" unique_id=693351917]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=94759680]
+layout_mode = 2
+text = "Text"
+
+[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=1427657007]
+layout_mode = 2
+text = "Style 1"
+
+[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=79336442]
+layout_mode = 2
+text = "Style 2"
+
+[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=551143717]
+layout_mode = 2
+text = "Color"
+
+[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=1564415210]
+layout_mode = 2
+text = "Thickness"
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_add_node"]
+[connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]

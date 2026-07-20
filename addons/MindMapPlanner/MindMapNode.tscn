@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://c3hsdtwaq6jig"]
+
+[ext_resource type="Script" uid="uid://btpjyefksrvnx" path="res://addons/MindMapPlanner/MindMapNode.gd" id="1_1t6f1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_epqjv"]
+
+[node name="MindMapNode" type="PanelContainer" unique_id=1604110263]
+offset_right = 211.0
+offset_bottom = 41.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_epqjv")
+script = ExtResource("1_1t6f1")
+
+[node name="Label" type="Label" parent="." unique_id=1426589713]
+layout_mode = 2
+text = "New Node"
+horizontal_alignment = 1
