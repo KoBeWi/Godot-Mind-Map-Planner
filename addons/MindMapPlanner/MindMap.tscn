@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bvecrq1nv8uwx" path="res://addons/MindMapPlanner/EditorTexture.gd" id="1_54pab"]
 [ext_resource type="Script" uid="uid://dyjdl348y6pt4" path="res://addons/MindMapPlanner/MindMap.gd" id="1_eaywk"]
+[ext_resource type="Script" uid="uid://bmdu8apxpkgs3" path="res://addons/MindMapPlanner/NodeSettings.gd" id="3_pphkt"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_43nvq"]
 script = ExtResource("1_54pab")
@@ -54,71 +55,136 @@ offset_right = 107.0
 offset_bottom = 27.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_43nvq")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=11973182]
+[node name="NodeSettings" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=11973182]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
+script = ExtResource("3_pphkt")
 
-[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer" unique_id=2068977014]
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings" unique_id=2068977014]
 layout_mode = 2
+theme_type_variation = &"HeaderSmall"
 text = "Node Options"
+horizontal_alignment = 1
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer" unique_id=882578155]
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings" unique_id=882578155]
 layout_mode = 2
+columns = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=639663187]
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=639663187]
 layout_mode = 2
 text = "Text"
+horizontal_alignment = 2
 
-[node name="Label6" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=1830032423]
+[node name="TextEdit" type="LineEdit" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=1795065973]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label6" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=1830032423]
 layout_mode = 2
 text = "Shape"
+horizontal_alignment = 2
 
-[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=573196061]
+[node name="ShapeButton" type="OptionButton" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=920726213]
+unique_name_in_owner = true
+layout_mode = 2
+item_count = 6
+popup/item_0/text = "Rect"
+popup/item_0/id = 0
+popup/item_1/text = "Rounded Rect"
+popup/item_1/id = 1
+popup/item_2/text = "Parrallelogram"
+popup/item_2/id = 2
+popup/item_3/text = "Rhomb"
+popup/item_3/id = 3
+popup/item_4/text = "Oval"
+popup/item_4/id = 4
+popup/item_5/text = "Circle"
+popup/item_5/id = 5
+
+[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=573196061]
 layout_mode = 2
 text = "Fill Color"
+horizontal_alignment = 2
 
-[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=1258827091]
+[node name="NodeColor" type="ColorPickerButton" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=1898834931]
+unique_name_in_owner = true
+layout_mode = 2
+edit_alpha = false
+edit_intensity = false
+
+[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=1258827091]
 layout_mode = 2
 text = "Border Color"
+horizontal_alignment = 2
 
-[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=937705908]
+[node name="BorderColor" type="ColorPickerButton" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=581756856]
+unique_name_in_owner = true
+layout_mode = 2
+edit_alpha = false
+edit_intensity = false
+
+[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=937705908]
 layout_mode = 2
 text = "Text Color"
+horizontal_alignment = 2
 
-[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer/GridContainer" unique_id=269358707]
+[node name="TextColor" type="ColorPickerButton" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=1501493148]
+unique_name_in_owner = true
+layout_mode = 2
+edit_alpha = false
+edit_intensity = false
+
+[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=269358707]
 layout_mode = 2
 text = "Size"
+horizontal_alignment = 2
 
-[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=1966239208]
+[node name="Size" type="HSlider" parent="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer" unique_id=974015627]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = 16.0
+max_value = 80.0
+value = 16.0
+
+[node name="ConnectionSettings" type="VBoxContainer" parent="VBoxContainer/Canvas/PanelContainer" unique_id=1966239208]
+unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2" unique_id=671945319]
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings" unique_id=671945319]
 layout_mode = 2
 text = "Connection Options"
 
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2" unique_id=693351917]
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings" unique_id=693351917]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=94759680]
+[node name="Label" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings/GridContainer" unique_id=94759680]
 layout_mode = 2
 text = "Text"
 
-[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=1427657007]
+[node name="Label2" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings/GridContainer" unique_id=1427657007]
 layout_mode = 2
 text = "Style 1"
 
-[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=79336442]
+[node name="Label5" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings/GridContainer" unique_id=79336442]
 layout_mode = 2
 text = "Style 2"
 
-[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=551143717]
+[node name="Label3" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2
 text = "Color"
 
-[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/VBoxContainer2/GridContainer" unique_id=1564415210]
+[node name="Label4" type="Label" parent="VBoxContainer/Canvas/PanelContainer/ConnectionSettings/GridContainer" unique_id=1564415210]
 layout_mode = 2
 text = "Thickness"
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_add_node"]
 [connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]
+[connection signal="text_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/TextEdit" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_text_edit_text_changed"]
+[connection signal="item_selected" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/ShapeButton" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_shape_button_item_selected"]
+[connection signal="color_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/NodeColor" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_node_color_color_changed"]
+[connection signal="color_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/TextColor" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_text_color_color_changed"]
+[connection signal="value_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/Size" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_size_value_changed"]

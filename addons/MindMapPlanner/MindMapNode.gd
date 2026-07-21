@@ -1,13 +1,24 @@
 @tool
 extends MarginContainer
 
-enum Shape{ CIRCLE, OVAL, RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB}
+enum Shape{ RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 
 @onready var label: Label = %Label
 @onready var line_edit: LineEdit = %LineEdit
 
 var shape := Shape.RECT
 var color := Color.WHITE
+var text_color:
+	set(tc):
+		label.add_theme_color_override(&"font_color", tc)
+	get:
+		return label.get_theme_color(&"font_color")
+
+var node_size := 14:
+	set(s):
+		label.add_theme_font_size_override(&"font_size", s)
+	get:
+		return label.get_theme_font_size(&"font_size")
 
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
@@ -22,7 +33,10 @@ func get_data() -> Dictionary:
 	var data: Dictionary
 	data.position = position
 	data.text = label.text
+	data.text_color = text_color.to_html(false)
 	data.color = color.to_html(false)
+	data.shape = shape
+	data.size = node_size
 	return data
 
 func set_data(data: Dictionary):
@@ -30,7 +44,10 @@ func set_data(data: Dictionary):
 	position.x = pos.get_slice(",", 0).to_float()
 	position.y = pos.get_slice(",", 1).to_float()
 	label.text = data["text"]
+	text_color = Color(data["text_color"])
 	color = Color(data["color"])
+	shape = data["shape"]
+	node_size = data["size"]
 	
 	reset_size()
 
@@ -76,7 +93,7 @@ func _draw() -> void:
 		Shape.CIRCLE:
 			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, color)
 		Shape.OVAL:
-			draw_ellipse(size * 0.5, size.x, size.y, color)
+			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, color)
 		Shape.RECT:
 			draw_rect(Rect2(Vector2(), size), color)
 		Shape.ROUND_RECT:
