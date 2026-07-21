@@ -12,6 +12,7 @@ var color := Color.WHITE
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
 var dragging_active: bool
+var rounded_sb: StyleBoxFlat
 
 var try_select: bool
 
@@ -30,6 +31,8 @@ func set_data(data: Dictionary):
 	position.y = pos.get_slice(",", 1).to_float()
 	label.text = data["text"]
 	color = Color(data["color"])
+	
+	reset_size()
 
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
@@ -70,8 +73,38 @@ func _gui_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	match shape:
+		Shape.CIRCLE:
+			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, color)
+		Shape.OVAL:
+			draw_ellipse(size * 0.5, size.x, size.y, color)
 		Shape.RECT:
 			draw_rect(Rect2(Vector2(), size), color)
+		Shape.ROUND_RECT:
+			if not rounded_sb:
+				rounded_sb = StyleBoxFlat.new()
+				rounded_sb.bg_color = color
+				rounded_sb.corner_radius_bottom_left = 16
+				rounded_sb.corner_radius_bottom_right = 16
+				rounded_sb.corner_radius_top_left = 16
+				rounded_sb.corner_radius_top_right = 16
+			
+			draw_style_box(rounded_sb, Rect2(Vector2(), size))
+		Shape.PARRALLELOGRAM:
+			var polygon: PackedVector2Array = [
+				Vector2(size.x * 0.15, 0),
+				Vector2(size.x, 0),
+				Vector2(size.x * 0.85, size.y),
+				Vector2(0, size.y)
+			]
+			draw_polygon(polygon, [color])
+		Shape.RHOMB:
+			var polygon: PackedVector2Array = [
+				Vector2(0, size.y * 0.5),
+				Vector2(size.x * 0.5, 0),
+				Vector2(size.x, size.y * 0.5),
+				Vector2(size.x * 0.5, size.y)
+			]
+			draw_polygon(polygon, [color])
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:
