@@ -145,7 +145,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 size_flags_vertical = 4
-min_value = 16.0
+min_value = 14.0
 max_value = 80.0
 value = 16.0
 
@@ -186,5 +186,6 @@ text = "Thickness"
 [connection signal="text_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/TextEdit" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_text_edit_text_changed"]
 [connection signal="item_selected" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/ShapeButton" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_shape_button_item_selected"]
 [connection signal="color_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/NodeColor" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_node_color_color_changed"]
+[connection signal="color_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/BorderColor" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_border_color_color_changed"]
 [connection signal="color_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/TextColor" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_text_color_color_changed"]
 [connection signal="value_changed" from="VBoxContainer/Canvas/PanelContainer/NodeSettings/GridContainer/Size" to="VBoxContainer/Canvas/PanelContainer/NodeSettings" method="_on_size_value_changed"]

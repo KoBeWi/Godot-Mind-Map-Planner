@@ -10,6 +10,7 @@ var panning_origin: Vector2
 
 func create_node() -> Control:
 	var node: Control = preload("uid://c3hsdtwaq6jig").instantiate()
+	node.reset_size()
 	node.selected.connect(_on_node_selected.bind(node))
 	return node
 

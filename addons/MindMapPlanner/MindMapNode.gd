@@ -7,18 +7,27 @@ enum Shape{ RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 @onready var line_edit: LineEdit = %LineEdit
 
 var shape := Shape.RECT
-var color := Color.WHITE
+var color := Color.WHITE:
+	set(c):
+		color = c
+		rounded_sb = null
+
+var border_color := Color.BLACK:
+	set(c):
+		border_color = c
+		rounded_sb = null
+
 var text_color:
 	set(tc):
+		text_color = tc
 		label.add_theme_color_override(&"font_color", tc)
-	get:
-		return label.get_theme_color(&"font_color")
 
 var node_size := 14:
 	set(s):
+		node_size = s
+		rounded_sb = null
 		label.add_theme_font_size_override(&"font_size", s)
-	get:
-		return label.get_theme_font_size(&"font_size")
+		reset_size()
 
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
@@ -35,6 +44,7 @@ func get_data() -> Dictionary:
 	data.text = label.text
 	data.text_color = text_color.to_html(false)
 	data.color = color.to_html(false)
+	data.border_color = border_color.to_html(false)
 	data.shape = shape
 	data.size = node_size
 	return data
@@ -46,6 +56,7 @@ func set_data(data: Dictionary):
 	label.text = data["text"]
 	text_color = Color(data["text_color"])
 	color = Color(data["color"])
+	border_color = Color(data["border_color"])
 	shape = data["shape"]
 	node_size = data["size"]
 	
@@ -89,21 +100,24 @@ func _gui_input(event: InputEvent) -> void:
 		position = dragging_origin + (mm.global_position - dragging_from)
 
 func _draw() -> void:
+	var border_size := node_size / 7
 	match shape:
 		Shape.CIRCLE:
 			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, color)
+			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, border_color, false, border_size)
 		Shape.OVAL:
 			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, color)
+			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, border_color, false, border_size)
 		Shape.RECT:
 			draw_rect(Rect2(Vector2(), size), color)
+			draw_rect(Rect2(Vector2(), size), border_color, false, border_size)
 		Shape.ROUND_RECT:
 			if not rounded_sb:
 				rounded_sb = StyleBoxFlat.new()
 				rounded_sb.bg_color = color
-				rounded_sb.corner_radius_bottom_left = 16
-				rounded_sb.corner_radius_bottom_right = 16
-				rounded_sb.corner_radius_top_left = 16
-				rounded_sb.corner_radius_top_right = 16
+				rounded_sb.border_color = border_color
+				rounded_sb.set_corner_radius_all(node_size / 2 + 9)
+				rounded_sb.set_border_width_all(border_size)
 			
 			draw_style_box(rounded_sb, Rect2(Vector2(), size))
 		Shape.PARRALLELOGRAM:
@@ -114,6 +128,9 @@ func _draw() -> void:
 				Vector2(0, size.y)
 			]
 			draw_polygon(polygon, [color])
+			
+			polygon.append(polygon[0])
+			draw_polyline(polygon, border_color, border_size)
 		Shape.RHOMB:
 			var polygon: PackedVector2Array = [
 				Vector2(0, size.y * 0.5),
@@ -122,6 +139,9 @@ func _draw() -> void:
 				Vector2(size.x * 0.5, size.y)
 			]
 			draw_polygon(polygon, [color])
+			
+			polygon.append(polygon[0])
+			draw_polyline(polygon, border_color, border_size)
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:
