@@ -17,7 +17,7 @@ var border_color := Color.BLACK:
 		border_color = c
 		rounded_sb = null
 
-var text_color:
+var text_color := Color.BLACK:
 	set(tc):
 		text_color = tc
 		label.add_theme_color_override(&"font_color", tc)
@@ -37,6 +37,8 @@ var rounded_sb: StyleBoxFlat
 var try_select: bool
 
 signal selected
+signal connected
+signal changed
 
 func get_data() -> Dictionary:
 	var data: Dictionary
@@ -49,7 +51,7 @@ func get_data() -> Dictionary:
 	data.size = node_size
 	return data
 
-func set_data(data: Dictionary):
+func set_data(data: Dictionary) -> void:
 	var pos: String = data["position"].substr(1)
 	position.x = pos.get_slice(",", 0).to_float()
 	position.y = pos.get_slice(",", 1).to_float()
@@ -65,26 +67,27 @@ func set_data(data: Dictionary):
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if mb:
-		if mb.button_index != MOUSE_BUTTON_LEFT:
-			return
+		if mb.button_index == MOUSE_BUTTON_LEFT:
+			if mb.pressed:
+				if mb.double_click:
+					line_edit.text = label.text
+					label.hide()
+					line_edit.show()
+					line_edit.edit()
+					line_edit.select_all()
+				else:
+					dragging_from = mb.global_position
+					dragging_origin = position
+					try_select = true
+			elif not mb.pressed:
+				dragging_from = Vector2.INF
+				dragging_active = false
+				
+				if try_select:
+					selected.emit()
 		
-		if mb.pressed:
-			if mb.double_click:
-				line_edit.text = label.text
-				label.hide()
-				line_edit.show()
-				line_edit.edit()
-				line_edit.select_all()
-			else:
-				dragging_from = mb.global_position
-				dragging_origin = position
-				try_select = true
-		elif not mb.pressed:
-			dragging_from = Vector2.INF
-			dragging_active = false
-			
-			if try_select:
-				selected.emit()
+		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
+			connected.emit()
 		
 		return
 	
@@ -98,6 +101,7 @@ func _gui_input(event: InputEvent) -> void:
 		dragging_active = true
 		try_select = false
 		position = dragging_origin + (mm.global_position - dragging_from)
+		changed.emit()
 
 func _draw() -> void:
 	var border_size := node_size / 7
