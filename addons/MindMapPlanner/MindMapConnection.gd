@@ -28,6 +28,7 @@ func _on_input_handler_gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if mb and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
 		selected.emit()
+		get_viewport().set_input_as_handled()
 
 func _draw() -> void:
 	var center1 := node1.position + node1.size * 0.5

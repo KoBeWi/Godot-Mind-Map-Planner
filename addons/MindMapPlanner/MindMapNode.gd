@@ -85,9 +85,12 @@ func _gui_input(event: InputEvent) -> void:
 				
 				if try_select:
 					selected.emit()
+			
+			accept_event()
 		
 		elif mb.button_index == MOUSE_BUTTON_RIGHT and mb.pressed:
 			connected.emit()
+			accept_event()
 		
 		return
 	
@@ -102,6 +105,7 @@ func _gui_input(event: InputEvent) -> void:
 		try_select = false
 		position = dragging_origin + (mm.global_position - dragging_from)
 		changed.emit()
+		accept_event()
 
 func _draw() -> void:
 	var border_size := node_size / 7

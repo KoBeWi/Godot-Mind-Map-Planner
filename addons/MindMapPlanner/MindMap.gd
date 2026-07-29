@@ -3,6 +3,8 @@ extends EditorDock
 
 @onready var node_transform: Node2D = %NodeTransform
 @onready var connection_transform: Node2D = %ConnectionTransform
+
+@onready var setting_container: PanelContainer = %SettingContainer
 @onready var node_settings: VBoxContainer = %NodeSettings
 @onready var connection_settings: VBoxContainer = %ConnectionSettings
 
@@ -29,6 +31,7 @@ func create_connection(node1: Node, node2: Node) -> Node2D:
 func set_active_settings(settings: Control):
 	node_settings.visible = settings == node_settings
 	connection_settings.visible = settings == connection_settings
+	setting_container.visible = settings != null
 
 func save_map():
 	var data: Dictionary
@@ -64,6 +67,10 @@ func load_map():
 		var node2 := node_transform.get_child(connection_data["node2"])
 		var connection := create_connection(node1, node2)
 		connection_transform.add_child(connection)
+
+func _ready() -> void:
+	if not is_part_of_edited_scene():
+		set_active_settings(null)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
@@ -121,7 +128,9 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 				panning_from = Vector2.INF
 		
 		elif mb.button_index == MOUSE_BUTTON_LEFT:
-			pass
+			selected_node = null
+			selected_connection = null
+			set_active_settings(null)
 		
 		return
 	
