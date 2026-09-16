@@ -59,13 +59,10 @@ size_flags_horizontal = 10
 theme_type_variation = &"HeaderSmall"
 text = "Graph:"
 
-[node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=678703794]
+[node name="GraphList" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=678703794]
+unique_name_in_owner = true
 auto_translate_mode = 2
 layout_mode = 2
-selected = 0
-item_count = 1
-popup/item_0/text = "New Graph"
-popup/item_0/id = 0
 
 [node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1954841160]
 layout_mode = 2
@@ -245,7 +242,7 @@ text = "End 2"
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 15
+item_count = 20
 popup/item_0/text = "None"
 popup/item_0/id = 0
 popup/item_1/text = "Arrow"
@@ -276,6 +273,16 @@ popup/item_13/text = "Diamond"
 popup/item_13/id = 13
 popup/item_14/text = "Circle"
 popup/item_14/id = 14
+popup/item_15/text = "None"
+popup/item_15/id = 15
+popup/item_16/text = "Arrow"
+popup/item_16/id = 16
+popup/item_17/text = "Double Arrow"
+popup/item_17/id = 17
+popup/item_18/text = "Diamond"
+popup/item_18/id = 18
+popup/item_19/text = "Circle"
+popup/item_19/id = 19
 
 [node name="Label3" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2

@@ -1,6 +1,8 @@
 @tool
 extends EditorDock
 
+@onready var graph_list: OptionButton = %GraphList
+
 @onready var node_transform: Node2D = %NodeTransform
 @onready var connection_transform: Node2D = %ConnectionTransform
 
@@ -17,6 +19,14 @@ var panning_origin: Vector2
 
 var selected_node: Control
 var selected_connection: Node2D
+
+func update_graph_list():
+	graph_list.clear()
+	
+	for graph in graphs:
+		graph_list.add_item(graph.name)
+		if graph == active_graph:
+			graph_list.select(graph_list.item_count - 1)
 
 func set_active_graph(graph: MindGraph):
 	for node in node_transform.get_children():
@@ -79,7 +89,11 @@ func _ready() -> void:
 	set_active_settings(null)
 	
 	if not FileAccess.file_exists(map_path):
-		graphs.append(MindGraph.new())
+		var default_graph := MindGraph.new()
+		default_graph.name = "New Graph"
+		graphs.append(default_graph)
+		set_active_graph(default_graph)
+		update_graph_list()
 		return
 	
 	var data: Array = JSON.parse_string(FileAccess.get_file_as_string(map_path))
@@ -90,18 +104,20 @@ func _ready() -> void:
 		
 		for node_data in graph["nodes"]:
 			var node := create_node()
-			node.ready.connect(node.set_data.bind(node_data), CONNECT_ONE_SHOT)
+			node.set_data(node_data)
 			mind_graph.nodes.append(node)
 		
 		for connection_data in graph["connections"]:
 			var node1 := mind_graph.nodes[connection_data["node1"]]
 			var node2 := mind_graph.nodes[connection_data["node2"]]
 			var connection := create_connection(node1, node2)
+			connection.set_data(connection_data)
 			mind_graph.connections.append(connection)
 		
 		graphs.append(mind_graph)
 	
 	set_active_graph(graphs[0])
+	update_graph_list()
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():

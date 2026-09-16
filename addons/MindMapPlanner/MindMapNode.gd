@@ -3,8 +3,8 @@ extends MarginContainer
 
 enum Shape{ RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 
-@onready var label: Label = %Label
-@onready var line_edit: LineEdit = %LineEdit
+var label: Label
+var line_edit: LineEdit
 
 var shape := Shape.RECT
 var color := Color.WHITE:
@@ -63,6 +63,11 @@ func set_data(data: Dictionary) -> void:
 	node_size = data["size"]
 	
 	reset_size()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_SCENE_INSTANTIATED:
+		label = %Label
+		line_edit = %LineEdit
 
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton

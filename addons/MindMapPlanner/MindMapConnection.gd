@@ -1,7 +1,7 @@
 @tool
 extends Node2D
 
-@onready var label: Label = %Label
+var label: Label
 @onready var label_pivot: Node2D = %LabelPivot
 @onready var input_handler: Control = %InputHandler
 
@@ -18,11 +18,15 @@ func get_data() -> Dictionary:
 	return data
 
 func set_data(data: Dictionary) -> void:
-	pass
+	label.text = data["text"]
 
 func _ready() -> void:
 	node1.changed.connect(queue_redraw)
 	node2.changed.connect(queue_redraw)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_SCENE_INSTANTIATED:
+		label = %Label
 
 func _on_input_handler_gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
