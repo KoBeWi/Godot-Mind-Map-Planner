@@ -14,3 +14,6 @@ func _init() -> void:
 
 func _on_setting_changed(setting: String, new_value: Variant) -> void:
 	dock.map_path = new_value
+
+func _apply_changes() -> void:
+	dock.save_map()

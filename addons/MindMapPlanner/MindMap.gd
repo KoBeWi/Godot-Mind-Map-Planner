@@ -1,7 +1,10 @@
 @tool
 extends EditorDock
 
-@onready var graph_list: OptionButton = %GraphList
+@onready var graph_select: OptionButton = %GraphSelect
+@onready var graph_dialog: AcceptDialog = %GraphDialog
+@onready var graph_list: Tree = %GraphList
+@onready var remove_graph_button: Button = %RemoveGraphButton
 
 @onready var node_transform: Node2D = %NodeTransform
 @onready var connection_transform: Node2D = %ConnectionTransform
@@ -21,12 +24,12 @@ var selected_node: Control
 var selected_connection: Node2D
 
 func update_graph_list():
-	graph_list.clear()
+	graph_select.clear()
 	
 	for graph in graphs:
-		graph_list.add_item(graph.name)
+		graph_select.add_item(graph.name)
 		if graph == active_graph:
-			graph_list.select(graph_list.item_count - 1)
+			graph_select.select(graph_select.item_count - 1)
 
 func set_active_graph(graph: MindGraph):
 	for node in node_transform.get_children():
@@ -73,7 +76,7 @@ func save_map():
 		graph_data["nodes"] = nodes
 		
 		var connections: Array[Dictionary]
-		for node in connection_transform.get_children():
+		for node in graph.connections:
 			connections.append(node.get_data())
 		graph_data["connections"] = connections
 		
@@ -86,35 +89,39 @@ func _ready() -> void:
 	if is_part_of_edited_scene():
 		return
 	
+	graph_dialog.hide()
 	set_active_settings(null)
 	
 	if not FileAccess.file_exists(map_path):
 		var default_graph := MindGraph.new()
 		default_graph.name = "New Graph"
 		graphs.append(default_graph)
-		set_active_graph(default_graph)
-		update_graph_list()
-		return
+	else:
+		var data: Array = JSON.parse_string(FileAccess.get_file_as_string(map_path))
+		
+		for graph: Dictionary in data:
+			var mind_graph := MindGraph.new()
+			mind_graph.name = graph["name"]
+			
+			for node_data in graph["nodes"]:
+				var node := create_node()
+				node.set_data(node_data)
+				mind_graph.nodes.append(node)
+			
+			for connection_data in graph["connections"]:
+				var node1 := mind_graph.nodes[connection_data["node1"]]
+				var node2 := mind_graph.nodes[connection_data["node2"]]
+				var connection := create_connection(node1, node2)
+				connection.set_data(connection_data)
+				mind_graph.connections.append(connection)
+			
+			graphs.append(mind_graph)
 	
-	var data: Array = JSON.parse_string(FileAccess.get_file_as_string(map_path))
-	
-	for graph: Dictionary in data:
-		var mind_graph := MindGraph.new()
-		mind_graph.name = graph["name"]
-		
-		for node_data in graph["nodes"]:
-			var node := create_node()
-			node.set_data(node_data)
-			mind_graph.nodes.append(node)
-		
-		for connection_data in graph["connections"]:
-			var node1 := mind_graph.nodes[connection_data["node1"]]
-			var node2 := mind_graph.nodes[connection_data["node2"]]
-			var connection := create_connection(node1, node2)
-			connection.set_data(connection_data)
-			mind_graph.connections.append(connection)
-		
-		graphs.append(mind_graph)
+	graph_list.create_item()
+	for graph in graphs:
+		var graph_item := graph_list.create_item()
+		graph_item.set_text(0, graph.name)
+		graph_item.set_editable(0, true)
 	
 	set_active_graph(graphs[0])
 	update_graph_list()
@@ -139,6 +146,51 @@ func _on_add_node() -> void:
 		var connection := create_connection(previous, node)
 		active_graph.connections.append(connection)
 		connection_transform.add_child(connection)
+
+func _manage_graphs() -> void:
+	remove_graph_button.disabled = true
+	graph_dialog.popup_centered()
+
+func _update_remove_button() -> void:
+	remove_graph_button.disabled = not graph_list.get_selected() or graph_list.get_root().get_child_count() == 1
+
+func _add_graph() -> void:
+	var graph := MindGraph.new()
+	graph.name = "New Graph"
+	graphs.append(graph)
+	
+	var item := graph_list.create_item()
+	item.set_text(0, graph.name)
+	item.set_editable(0, true)
+
+func _delete_graph() -> void:
+	var item := graph_list.get_selected()
+	if not item:
+		return
+	graphs.remove_at(item.get_index())
+	item.free()
+
+func _on_graph_list_item_edited() -> void:
+	var item := graph_list.get_edited()
+	if not item:
+		return
+	
+	graphs[item.get_index()].name = item.get_text(0)
+
+func _on_graph_dialog_visibility_changed() -> void:
+	if not graph_dialog or graph_dialog.visible:
+		return
+	update_graph_list()
+	graph_list.deselect_all()
+
+func _on_graph_list_reordered(from: int, to: int) -> void:
+	var graph := graphs[from]
+	graphs.remove_at(from)
+	
+	graphs.insert(to, graph)
+
+func _on_graph_selected(index: int) -> void:
+	set_active_graph(graphs[index])
 
 func _on_node_selected(node: Control):
 	selected_node = node
@@ -194,3 +246,6 @@ class MindGraph:
 	var name: String
 	var nodes: Array[Node]
 	var connections: Array[Node]
+	
+	func _to_string() -> String:
+		return "MindGraph@%s" % name

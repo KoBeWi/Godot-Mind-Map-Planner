@@ -21,8 +21,9 @@ func set_data(data: Dictionary) -> void:
 	label.text = data["text"]
 
 func _ready() -> void:
-	node1.changed.connect(queue_redraw)
-	node2.changed.connect(queue_redraw)
+	if not is_part_of_edited_scene():
+		node1.changed.connect(queue_redraw)
+		node2.changed.connect(queue_redraw)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
@@ -35,6 +36,9 @@ func _on_input_handler_gui_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _draw() -> void:
+	if is_part_of_edited_scene():
+		return
+	
 	var center1 := node1.position + node1.size * 0.5
 	var center2 := node2.position + node2.size * 0.5
 	

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://dyjdl348y6pt4" path="res://addons/MindMapPlanner/MindMap.gd" id="1_eaywk"]
 [ext_resource type="Script" uid="uid://bmdu8apxpkgs3" path="res://addons/MindMapPlanner/NodeSettings.gd" id="3_pphkt"]
 [ext_resource type="Script" uid="uid://cbe0aimqvkse5" path="res://addons/MindMapPlanner/ConnectionSettings.gd" id="4_xfbje"]
+[ext_resource type="Script" uid="uid://c4t2vfqp4dnuo" path="res://addons/MindMapPlanner/ReorderingTree.gd" id="5_xylo7"]
 
 [sub_resource type="ImageTexture" id="ImageTexture_43nvq"]
 script = ExtResource("1_54pab")
@@ -23,6 +24,14 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+
+[sub_resource type="ImageTexture" id="ImageTexture_hednn"]
+script = ExtResource("1_54pab")
+icon_name = &"Add"
+
+[sub_resource type="ImageTexture" id="ImageTexture_5fdew"]
+script = ExtResource("1_54pab")
+icon_name = &"Remove"
 
 [node name="MindMap" type="EditorDock" unique_id=550237809]
 anchors_preset = 15
@@ -59,13 +68,14 @@ size_flags_horizontal = 10
 theme_type_variation = &"HeaderSmall"
 text = "Graph:"
 
-[node name="GraphList" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=678703794]
+[node name="GraphSelect" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=678703794]
 unique_name_in_owner = true
 auto_translate_mode = 2
 layout_mode = 2
 
 [node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1954841160]
 layout_mode = 2
+tooltip_text = "Manage Graphs"
 icon = SubResource("ImageTexture_s5850")
 
 [node name="Canvas" type="Panel" parent="VBoxContainer" unique_id=44180881]
@@ -242,7 +252,7 @@ text = "End 2"
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 20
+item_count = 65
 popup/item_0/text = "None"
 popup/item_0/id = 0
 popup/item_1/text = "Arrow"
@@ -283,6 +293,96 @@ popup/item_18/text = "Diamond"
 popup/item_18/id = 18
 popup/item_19/text = "Circle"
 popup/item_19/id = 19
+popup/item_20/text = "None"
+popup/item_20/id = 20
+popup/item_21/text = "Arrow"
+popup/item_21/id = 21
+popup/item_22/text = "Double Arrow"
+popup/item_22/id = 22
+popup/item_23/text = "Diamond"
+popup/item_23/id = 23
+popup/item_24/text = "Circle"
+popup/item_24/id = 24
+popup/item_25/text = "None"
+popup/item_25/id = 25
+popup/item_26/text = "Arrow"
+popup/item_26/id = 26
+popup/item_27/text = "Double Arrow"
+popup/item_27/id = 27
+popup/item_28/text = "Diamond"
+popup/item_28/id = 28
+popup/item_29/text = "Circle"
+popup/item_29/id = 29
+popup/item_30/text = "None"
+popup/item_30/id = 30
+popup/item_31/text = "Arrow"
+popup/item_31/id = 31
+popup/item_32/text = "Double Arrow"
+popup/item_32/id = 32
+popup/item_33/text = "Diamond"
+popup/item_33/id = 33
+popup/item_34/text = "Circle"
+popup/item_34/id = 34
+popup/item_35/text = "None"
+popup/item_35/id = 35
+popup/item_36/text = "Arrow"
+popup/item_36/id = 36
+popup/item_37/text = "Double Arrow"
+popup/item_37/id = 37
+popup/item_38/text = "Diamond"
+popup/item_38/id = 38
+popup/item_39/text = "Circle"
+popup/item_39/id = 39
+popup/item_40/text = "None"
+popup/item_40/id = 40
+popup/item_41/text = "Arrow"
+popup/item_41/id = 41
+popup/item_42/text = "Double Arrow"
+popup/item_42/id = 42
+popup/item_43/text = "Diamond"
+popup/item_43/id = 43
+popup/item_44/text = "Circle"
+popup/item_44/id = 44
+popup/item_45/text = "None"
+popup/item_45/id = 45
+popup/item_46/text = "Arrow"
+popup/item_46/id = 46
+popup/item_47/text = "Double Arrow"
+popup/item_47/id = 47
+popup/item_48/text = "Diamond"
+popup/item_48/id = 48
+popup/item_49/text = "Circle"
+popup/item_49/id = 49
+popup/item_50/text = "None"
+popup/item_50/id = 50
+popup/item_51/text = "Arrow"
+popup/item_51/id = 51
+popup/item_52/text = "Double Arrow"
+popup/item_52/id = 52
+popup/item_53/text = "Diamond"
+popup/item_53/id = 53
+popup/item_54/text = "Circle"
+popup/item_54/id = 54
+popup/item_55/text = "None"
+popup/item_55/id = 55
+popup/item_56/text = "Arrow"
+popup/item_56/id = 56
+popup/item_57/text = "Double Arrow"
+popup/item_57/id = 57
+popup/item_58/text = "Diamond"
+popup/item_58/id = 58
+popup/item_59/text = "Circle"
+popup/item_59/id = 59
+popup/item_60/text = "None"
+popup/item_60/id = 60
+popup/item_61/text = "Arrow"
+popup/item_61/id = 61
+popup/item_62/text = "Double Arrow"
+popup/item_62/id = 62
+popup/item_63/text = "Diamond"
+popup/item_63/id = 63
+popup/item_64/text = "Circle"
+popup/item_64/id = 64
 
 [node name="Label3" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2
@@ -316,7 +416,52 @@ text = "Thickness"
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="GraphDialog" type="AcceptDialog" parent="." unique_id=1478629442]
+unique_name_in_owner = true
+oversampling_override = 1.0
+title = "Manage Graphs"
+position = Vector2i(-354, 24)
+size = Vector2i(300, 370)
+visible = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GraphDialog" unique_id=2044628388]
+offset_left = 9.0
+offset_top = 9.0
+offset_right = 291.0
+offset_bottom = 319.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="GraphDialog/VBoxContainer" unique_id=1049196899]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="GraphDialog/VBoxContainer/HBoxContainer2" unique_id=1328310623]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Add Graph"
+icon = SubResource("ImageTexture_hednn")
+
+[node name="RemoveGraphButton" type="Button" parent="GraphDialog/VBoxContainer/HBoxContainer2" unique_id=1774487424]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 10
+text = "Remove Graph"
+icon = SubResource("ImageTexture_5fdew")
+
+[node name="GraphList" type="Tree" parent="GraphDialog/VBoxContainer" unique_id=1869701347]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+hide_root = true
+scroll_hint_mode = 1
+script = ExtResource("5_xylo7")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GraphDialog/VBoxContainer" unique_id=1619714890]
+layout_mode = 2
+alignment = 1
+
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_add_node"]
+[connection signal="item_selected" from="VBoxContainer/HBoxContainer/GraphSelect" to="." method="_on_graph_selected"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Button2" to="." method="_manage_graphs"]
 [connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]
 [connection signal="text_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/TextEdit" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_text_edit_text_changed"]
 [connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/ShapeButton" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_shape_button_item_selected"]
@@ -325,3 +470,10 @@ layout_mode = 2
 [connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/TextColor" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_text_color_color_changed"]
 [connection signal="value_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/Size" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_size_value_changed"]
 [connection signal="text_changed" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/LabelEdit" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_label_edit_text_changed"]
+[connection signal="visibility_changed" from="GraphDialog" to="." method="_on_graph_dialog_visibility_changed"]
+[connection signal="pressed" from="GraphDialog/VBoxContainer/HBoxContainer2/Button" to="." method="_add_graph"]
+[connection signal="pressed" from="GraphDialog/VBoxContainer/HBoxContainer2/RemoveGraphButton" to="." method="_delete_graph"]
+[connection signal="item_edited" from="GraphDialog/VBoxContainer/GraphList" to="." method="_on_graph_list_item_edited"]
+[connection signal="item_selected" from="GraphDialog/VBoxContainer/GraphList" to="." method="_update_remove_button"]
+[connection signal="nothing_selected" from="GraphDialog/VBoxContainer/GraphList" to="." method="_update_remove_button"]
+[connection signal="reordered" from="GraphDialog/VBoxContainer/GraphList" to="." method="_on_graph_list_reordered"]
