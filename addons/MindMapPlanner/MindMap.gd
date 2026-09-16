@@ -8,11 +8,28 @@ extends EditorDock
 @onready var node_settings: VBoxContainer = %NodeSettings
 @onready var connection_settings: VBoxContainer = %ConnectionSettings
 
+var map_path: String
+var graphs: Array[MindGraph]
+var active_graph: MindGraph
+
 var panning_from := Vector2.INF
 var panning_origin: Vector2
 
 var selected_node: Control
 var selected_connection: Node2D
+
+func set_active_graph(graph: MindGraph):
+	for node in node_transform.get_children():
+		node_transform.remove_child(node)
+	for node in connection_transform.get_children():
+		connection_transform.remove_child(node)
+	
+	for node in graph.nodes:
+		node_transform.add_child(node)
+	for node in graph.connections:
+		connection_transform.add_child(node)
+	
+	active_graph = graph
 
 func create_node() -> Control:
 	var node: Control = preload("uid://c3hsdtwaq6jig").instantiate()
@@ -34,63 +51,77 @@ func set_active_settings(settings: Control):
 	setting_container.visible = settings != null
 
 func save_map():
-	var data: Dictionary
+	var data: Array[Dictionary]
 	
-	var nodes: Array[Dictionary]
-	data.nodes = nodes
-	for node in node_transform.get_children():
-		nodes.append(node.get_data())
+	for graph in graphs:
+		var graph_data: Dictionary[String, Variant]
+		graph_data["name"] = graph.name
+		
+		var nodes: Array[Dictionary]
+		for node in graph.nodes:
+			nodes.append(node.get_data())
+		graph_data["nodes"] = nodes
+		
+		var connections: Array[Dictionary]
+		for node in connection_transform.get_children():
+			connections.append(node.get_data())
+		graph_data["connections"] = connections
+		
+		data.append(graph_data)
 	
-	var connections: Array[Dictionary]
-	data.connections = connections
-	for node in connection_transform.get_children():
-		connections.append(node.get_data())
-	
-	var file := FileAccess.open("res://ProjectData/test.txt", FileAccess.WRITE)
+	var file := FileAccess.open(map_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(data, "	", false))
 
-func load_map():
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://ProjectData/test.txt"))
-	
-	for node in node_transform.get_children():
-		node.free()
-	for node in connection_transform.get_children():
-		node.free()
-	
-	for node_data in data["nodes"]:
-		var node := create_node()
-		node.ready.connect(node.set_data.bind(node_data), CONNECT_ONE_SHOT)
-		node_transform.add_child(node)
-	
-	for connection_data in data["connections"]:
-		var node1 := node_transform.get_child(connection_data["node1"])
-		var node2 := node_transform.get_child(connection_data["node2"])
-		var connection := create_connection(node1, node2)
-		connection_transform.add_child(connection)
-
 func _ready() -> void:
-	if not is_part_of_edited_scene():
-		set_active_settings(null)
+	if is_part_of_edited_scene():
+		return
+	
+	set_active_settings(null)
+	
+	if not FileAccess.file_exists(map_path):
+		graphs.append(MindGraph.new())
+		return
+	
+	var data: Array = JSON.parse_string(FileAccess.get_file_as_string(map_path))
+	
+	for graph: Dictionary in data:
+		var mind_graph := MindGraph.new()
+		mind_graph.name = graph["name"]
+		
+		for node_data in graph["nodes"]:
+			var node := create_node()
+			node.ready.connect(node.set_data.bind(node_data), CONNECT_ONE_SHOT)
+			mind_graph.nodes.append(node)
+		
+		for connection_data in graph["connections"]:
+			var node1 := mind_graph.nodes[connection_data["node1"]]
+			var node2 := mind_graph.nodes[connection_data["node2"]]
+			var connection := create_connection(node1, node2)
+			mind_graph.connections.append(connection)
+		
+		graphs.append(mind_graph)
+	
+	set_active_graph(graphs[0])
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
 	
 	var k := event as InputEventKey
-	if k and k.pressed:
+	if k and not k.pressed:
 		if k.keycode == KEY_S:
 			save_map()
-		elif k.keycode == KEY_L:
-			load_map()
 
 func _on_add_node() -> void:
 	var node := create_node()
 	node.position = -node_transform.position + size * 0.5 - node.size * 0.5
+	active_graph.nodes.append(node)
 	node_transform.add_child(node)
 	
 	if node_transform.get_child_count() > 1:
 		var previous := node_transform.get_child(-2)
 		var connection := create_connection(previous, node)
+		active_graph.connections.append(connection)
 		connection_transform.add_child(connection)
 
 func _on_node_selected(node: Control):
@@ -115,6 +146,7 @@ func _attempt_connection(to_node: Control):
 			return
 	
 	var connection := create_connection(selected_node, to_node)
+	active_graph.connections.append(connection)
 	connection_transform.add_child(connection)
 
 func _on_canvas_gui_input(event: InputEvent) -> void:
@@ -141,3 +173,8 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 	if mm:
 		node_transform.position = panning_origin + (mm.position - panning_from)
 		connection_transform.position = node_transform.position
+
+class MindGraph:
+	var name: String
+	var nodes: Array[Node]
+	var connections: Array[Node]

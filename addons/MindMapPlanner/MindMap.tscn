@@ -9,6 +9,10 @@
 script = ExtResource("1_54pab")
 icon_name = &"Add"
 
+[sub_resource type="ImageTexture" id="ImageTexture_s5850"]
+script = ExtResource("1_54pab")
+icon_name = &"Edit"
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_43nvq"]
 content_margin_left = 8.0
 content_margin_top = 8.0
@@ -48,6 +52,24 @@ text = "Connect to Previous"
 [node name="CheckBox2" type="CheckBox" parent="VBoxContainer/HBoxContainer" unique_id=1214919024]
 layout_mode = 2
 text = "Copy Last Style"
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1529592123]
+layout_mode = 2
+size_flags_horizontal = 10
+theme_type_variation = &"HeaderSmall"
+text = "Graph:"
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=678703794]
+auto_translate_mode = 2
+layout_mode = 2
+selected = 0
+item_count = 1
+popup/item_0/text = "New Graph"
+popup/item_0/id = 0
+
+[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1954841160]
+layout_mode = 2
+icon = SubResource("ImageTexture_s5850")
 
 [node name="Canvas" type="Panel" parent="VBoxContainer" unique_id=44180881]
 clip_contents = true
@@ -223,7 +245,7 @@ text = "End 2"
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 5
+item_count = 15
 popup/item_0/text = "None"
 popup/item_0/id = 0
 popup/item_1/text = "Arrow"
@@ -234,6 +256,26 @@ popup/item_3/text = "Diamond"
 popup/item_3/id = 3
 popup/item_4/text = "Circle"
 popup/item_4/id = 4
+popup/item_5/text = "None"
+popup/item_5/id = 5
+popup/item_6/text = "Arrow"
+popup/item_6/id = 6
+popup/item_7/text = "Double Arrow"
+popup/item_7/id = 7
+popup/item_8/text = "Diamond"
+popup/item_8/id = 8
+popup/item_9/text = "Circle"
+popup/item_9/id = 9
+popup/item_10/text = "None"
+popup/item_10/id = 10
+popup/item_11/text = "Arrow"
+popup/item_11/id = 11
+popup/item_12/text = "Double Arrow"
+popup/item_12/id = 12
+popup/item_13/text = "Diamond"
+popup/item_13/id = 13
+popup/item_14/text = "Circle"
+popup/item_14/id = 14
 
 [node name="Label3" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2
