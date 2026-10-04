@@ -152,6 +152,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_43nvq")
 
 [node name="NodeSettings" type="VBoxContainer" parent="VBoxContainer/Canvas/SettingContainer" unique_id=11973182]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 script = ExtResource("3_pphkt")
 
@@ -245,7 +246,6 @@ value = 16.0
 
 [node name="ConnectionSettings" type="VBoxContainer" parent="VBoxContainer/Canvas/SettingContainer" unique_id=1966239208]
 unique_name_in_owner = true
-visible = false
 layout_mode = 2
 script = ExtResource("4_xfbje")
 
@@ -303,158 +303,6 @@ text = "End 2"
 [node name="End2" type="OptionButton" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=147197807]
 unique_name_in_owner = true
 layout_mode = 2
-selected = 0
-item_count = 75
-popup/item_0/text = "None"
-popup/item_0/id = 0
-popup/item_1/text = "Arrow"
-popup/item_1/id = 1
-popup/item_2/text = "Double Arrow"
-popup/item_2/id = 2
-popup/item_3/text = "Diamond"
-popup/item_3/id = 3
-popup/item_4/text = "Circle"
-popup/item_4/id = 4
-popup/item_5/text = "None"
-popup/item_5/id = 5
-popup/item_6/text = "Arrow"
-popup/item_6/id = 6
-popup/item_7/text = "Double Arrow"
-popup/item_7/id = 7
-popup/item_8/text = "Diamond"
-popup/item_8/id = 8
-popup/item_9/text = "Circle"
-popup/item_9/id = 9
-popup/item_10/text = "None"
-popup/item_10/id = 10
-popup/item_11/text = "Arrow"
-popup/item_11/id = 11
-popup/item_12/text = "Double Arrow"
-popup/item_12/id = 12
-popup/item_13/text = "Diamond"
-popup/item_13/id = 13
-popup/item_14/text = "Circle"
-popup/item_14/id = 14
-popup/item_15/text = "None"
-popup/item_15/id = 15
-popup/item_16/text = "Arrow"
-popup/item_16/id = 16
-popup/item_17/text = "Double Arrow"
-popup/item_17/id = 17
-popup/item_18/text = "Diamond"
-popup/item_18/id = 18
-popup/item_19/text = "Circle"
-popup/item_19/id = 19
-popup/item_20/text = "None"
-popup/item_20/id = 20
-popup/item_21/text = "Arrow"
-popup/item_21/id = 21
-popup/item_22/text = "Double Arrow"
-popup/item_22/id = 22
-popup/item_23/text = "Diamond"
-popup/item_23/id = 23
-popup/item_24/text = "Circle"
-popup/item_24/id = 24
-popup/item_25/text = "None"
-popup/item_25/id = 25
-popup/item_26/text = "Arrow"
-popup/item_26/id = 26
-popup/item_27/text = "Double Arrow"
-popup/item_27/id = 27
-popup/item_28/text = "Diamond"
-popup/item_28/id = 28
-popup/item_29/text = "Circle"
-popup/item_29/id = 29
-popup/item_30/text = "None"
-popup/item_30/id = 30
-popup/item_31/text = "Arrow"
-popup/item_31/id = 31
-popup/item_32/text = "Double Arrow"
-popup/item_32/id = 32
-popup/item_33/text = "Diamond"
-popup/item_33/id = 33
-popup/item_34/text = "Circle"
-popup/item_34/id = 34
-popup/item_35/text = "None"
-popup/item_35/id = 35
-popup/item_36/text = "Arrow"
-popup/item_36/id = 36
-popup/item_37/text = "Double Arrow"
-popup/item_37/id = 37
-popup/item_38/text = "Diamond"
-popup/item_38/id = 38
-popup/item_39/text = "Circle"
-popup/item_39/id = 39
-popup/item_40/text = "None"
-popup/item_40/id = 40
-popup/item_41/text = "Arrow"
-popup/item_41/id = 41
-popup/item_42/text = "Double Arrow"
-popup/item_42/id = 42
-popup/item_43/text = "Diamond"
-popup/item_43/id = 43
-popup/item_44/text = "Circle"
-popup/item_44/id = 44
-popup/item_45/text = "None"
-popup/item_45/id = 45
-popup/item_46/text = "Arrow"
-popup/item_46/id = 46
-popup/item_47/text = "Double Arrow"
-popup/item_47/id = 47
-popup/item_48/text = "Diamond"
-popup/item_48/id = 48
-popup/item_49/text = "Circle"
-popup/item_49/id = 49
-popup/item_50/text = "None"
-popup/item_50/id = 50
-popup/item_51/text = "Arrow"
-popup/item_51/id = 51
-popup/item_52/text = "Double Arrow"
-popup/item_52/id = 52
-popup/item_53/text = "Diamond"
-popup/item_53/id = 53
-popup/item_54/text = "Circle"
-popup/item_54/id = 54
-popup/item_55/text = "None"
-popup/item_55/id = 55
-popup/item_56/text = "Arrow"
-popup/item_56/id = 56
-popup/item_57/text = "Double Arrow"
-popup/item_57/id = 57
-popup/item_58/text = "Diamond"
-popup/item_58/id = 58
-popup/item_59/text = "Circle"
-popup/item_59/id = 59
-popup/item_60/text = "None"
-popup/item_60/id = 60
-popup/item_61/text = "Arrow"
-popup/item_61/id = 61
-popup/item_62/text = "Double Arrow"
-popup/item_62/id = 62
-popup/item_63/text = "Diamond"
-popup/item_63/id = 63
-popup/item_64/text = "Circle"
-popup/item_64/id = 64
-popup/item_65/text = "None"
-popup/item_65/id = 65
-popup/item_66/text = "Arrow"
-popup/item_66/id = 66
-popup/item_67/text = "Double Arrow"
-popup/item_67/id = 67
-popup/item_68/text = "Diamond"
-popup/item_68/id = 68
-popup/item_69/text = "Circle"
-popup/item_69/id = 69
-popup/item_70/text = "None"
-popup/item_70/id = 70
-popup/item_71/text = "Arrow"
-popup/item_71/id = 71
-popup/item_72/text = "Double Arrow"
-popup/item_72/id = 72
-popup/item_73/text = "Diamond"
-popup/item_73/id = 73
-popup/item_74/text = "Circle"
-popup/item_74/id = 74
 
 [node name="Label3" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2
@@ -487,6 +335,9 @@ text = "Thickness"
 [node name="Thickness" type="SpinBox" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=533034956]
 unique_name_in_owner = true
 layout_mode = 2
+min_value = 1.0
+max_value = 20.0
+value = 1.0
 
 [node name="GraphDialog" type="AcceptDialog" parent="." unique_id=1478629442]
 unique_name_in_owner = true
@@ -542,6 +393,12 @@ alignment = 1
 [connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/TextColor" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_text_color_color_changed"]
 [connection signal="value_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/Size" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_size_value_changed"]
 [connection signal="text_changed" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/LabelEdit" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_label_edit_text_changed"]
+[connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/LabelColor" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_label_color_color_changed"]
+[connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/End1" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_end_1_item_selected"]
+[connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/End2" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_end_2_item_selected"]
+[connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/LineColor" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_line_color_color_changed"]
+[connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/LineStyle" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_line_style_item_selected"]
+[connection signal="value_changed" from="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer/Thickness" to="VBoxContainer/Canvas/SettingContainer/ConnectionSettings" method="_on_thickness_value_changed"]
 [connection signal="visibility_changed" from="GraphDialog" to="." method="_on_graph_dialog_visibility_changed"]
 [connection signal="pressed" from="GraphDialog/VBoxContainer/HBoxContainer2/Button" to="." method="_add_graph"]
 [connection signal="pressed" from="GraphDialog/VBoxContainer/HBoxContainer2/RemoveGraphButton" to="." method="_delete_graph"]

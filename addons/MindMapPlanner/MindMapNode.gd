@@ -45,7 +45,7 @@ signal changed
 
 func get_data() -> Dictionary:
 	var data: Dictionary
-	data.position = position
+	data.position = position + size * 0.5
 	data.text = label.text
 	data.text_color = text_color.to_html(false)
 	data.color = color.to_html(false)
