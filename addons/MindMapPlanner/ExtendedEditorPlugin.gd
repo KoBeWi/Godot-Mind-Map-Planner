@@ -1,17 +1,12 @@
 @tool
 extends EditorPlugin
 
-var _main_screen_dock: EditorDock
 var _translation_list: Array[Translation]
 var _tracked_project_settings: PackedStringArray
 var _project_skip_hack: bool
 var _tracked_editor_settings: PackedStringArray
 
 var tr_extract: RefCounted
-
-func set_main_screen_dock(dock: EditorDock) -> void:
-	_main_screen_dock = dock
-	_main_screen_dock.hide()
 
 func add_plugin_translation(translation: Translation) -> void:
 	_translation_list.append(translation)
@@ -117,34 +112,8 @@ func _check_settings() -> void:
 func _on_setting_changed(setting: String, new_value: Variant) -> void:
 	pass
 
-func _has_main_screen() -> bool:
-	return _main_screen_dock != null
-
-func _get_plugin_name() -> String:
-	if not _main_screen_dock:
-		return ""
-	if not _main_screen_dock.title.is_empty():
-		return _main_screen_dock.title
-	return _main_screen_dock.name
-
-func _get_plugin_icon() -> Texture2D:
-	if not _main_screen_dock:
-		return null
-	if _main_screen_dock.dock_icon:
-		return _main_screen_dock.dock_icon
-	if not _main_screen_dock.icon_name.is_empty():
-		return EditorInterface.get_editor_theme().get_icon(_main_screen_dock.icon_name, &"EditorIcons")
-	return null
-
-func _make_visible(visible: bool) -> void:
-	if _main_screen_dock:
-		_main_screen_dock.visible = visible
-
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_ENTER_TREE:
-		if _main_screen_dock:
-			EditorInterface.get_editor_main_screen().add_child(_main_screen_dock)
-		
 		if not tr_extract:
 			tr_extract = RefCounted.new()
 			tr_extract.set_message_translation(false)
@@ -158,9 +127,6 @@ func _notification(what: int) -> void:
 		return
 
 	if what == NOTIFICATION_EXIT_TREE:
-		if _main_screen_dock:
-			_main_screen_dock.queue_free()
-		
 		var domain := TranslationServer.get_or_add_domain(&"godot.editor")
 		for translation in _translation_list:
 			domain.remove_translation(translation)

@@ -41,6 +41,8 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
 icon_name = &"AtlasTexture"
+default_slot = 11
+available_layouts = 14
 script = ExtResource("1_eaywk")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1140561842]
@@ -252,7 +254,7 @@ text = "End 2"
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 65
+item_count = 75
 popup/item_0/text = "None"
 popup/item_0/id = 0
 popup/item_1/text = "Arrow"
@@ -383,6 +385,26 @@ popup/item_63/text = "Diamond"
 popup/item_63/id = 63
 popup/item_64/text = "Circle"
 popup/item_64/id = 64
+popup/item_65/text = "None"
+popup/item_65/id = 65
+popup/item_66/text = "Arrow"
+popup/item_66/id = 66
+popup/item_67/text = "Double Arrow"
+popup/item_67/id = 67
+popup/item_68/text = "Diamond"
+popup/item_68/id = 68
+popup/item_69/text = "Circle"
+popup/item_69/id = 69
+popup/item_70/text = "None"
+popup/item_70/id = 70
+popup/item_71/text = "Arrow"
+popup/item_71/id = 71
+popup/item_72/text = "Double Arrow"
+popup/item_72/id = 72
+popup/item_73/text = "Diamond"
+popup/item_73/id = 73
+popup/item_74/text = "Circle"
+popup/item_74/id = 74
 
 [node name="Label3" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=551143717]
 layout_mode = 2
