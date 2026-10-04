@@ -1,10 +1,13 @@
 @tool
 extends MarginContainer
 
-enum Shape{ RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
+enum Shape { RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 
 var label: Label
 var line_edit: LineEdit
+
+var check_edit: Callable
+var draw_selection: bool
 
 var shape := Shape.RECT
 var color := Color.WHITE:
@@ -64,6 +67,14 @@ func set_data(data: Dictionary) -> void:
 	
 	reset_size()
 
+func copy_style(from: Control):
+	text_color = from.text_color
+	color = from.color
+	border_color = from.border_color
+	shape = from.shape
+	node_size = from.node_size
+	queue_redraw()
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
 		label = %Label
@@ -75,14 +86,18 @@ func _gui_input(event: InputEvent) -> void:
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			if mb.pressed:
 				if mb.double_click:
+					if not check_edit.call():
+						return
+					
 					line_edit.text = label.text
 					label.hide()
 					line_edit.show()
 					line_edit.edit()
 					line_edit.select_all()
 				else:
-					dragging_from = mb.global_position
-					dragging_origin = position
+					if check_edit.call():
+						dragging_from = mb.global_position
+						dragging_origin = position
 					try_select = true
 			elif not mb.pressed:
 				dragging_from = Vector2.INF
@@ -113,17 +128,31 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 func _draw() -> void:
+	var selection_color := Color.WHITE
+	
 	var border_size := node_size / 7
 	match shape:
 		Shape.CIRCLE:
 			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, color)
 			draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5, border_color, false, border_size)
+			
+			if draw_selection:
+				draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5 + 8, selection_color, false)
+		
 		Shape.OVAL:
 			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, color)
 			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, border_color, false, border_size)
+			
+			if draw_selection:
+				draw_ellipse(size * 0.5, size.x * 0.5 + 8, size.y * 0.5 + 8, selection_color, false)
+		
 		Shape.RECT:
 			draw_rect(Rect2(Vector2(), size), color)
 			draw_rect(Rect2(Vector2(), size), border_color, false, border_size)
+			
+			if draw_selection:
+				draw_rect(Rect2(Vector2(), size).grow(8), selection_color, false)
+		
 		Shape.ROUND_RECT:
 			if not rounded_sb:
 				rounded_sb = StyleBoxFlat.new()
@@ -133,6 +162,9 @@ func _draw() -> void:
 				rounded_sb.set_border_width_all(border_size)
 			
 			draw_style_box(rounded_sb, Rect2(Vector2(), size))
+			if draw_selection:
+				draw_rect(Rect2(Vector2(), size).grow(8), selection_color, false)
+		
 		Shape.PARRALLELOGRAM:
 			var polygon: PackedVector2Array = [
 				Vector2(size.x * 0.15, 0),
@@ -144,6 +176,16 @@ func _draw() -> void:
 			
 			polygon.append(polygon[0])
 			draw_polyline(polygon, border_color, border_size)
+			
+			if draw_selection:
+				for i in 4:
+					var p := polygon[i]
+					p += (p - size * 0.5).normalized() * 8
+					polygon[i] = p
+				
+				polygon[4] = polygon[0]
+				draw_polyline(polygon, selection_color)
+		
 		Shape.RHOMB:
 			var polygon: PackedVector2Array = [
 				Vector2(0, size.y * 0.5),
@@ -155,6 +197,15 @@ func _draw() -> void:
 			
 			polygon.append(polygon[0])
 			draw_polyline(polygon, border_color, border_size)
+			
+			if draw_selection:
+				for i in 4:
+					var p := polygon[i]
+					p += (p - size * 0.5).normalized() * 8
+					polygon[i] = p
+				
+				polygon[4] = polygon[0]
+				draw_polyline(polygon, selection_color)
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:

@@ -5,6 +5,8 @@ var label: Label
 @onready var label_pivot: Node2D = %LabelPivot
 @onready var input_handler: Control = %InputHandler
 
+var draw_selection: bool
+
 var node1: Control
 var node2: Control
 
@@ -54,4 +56,19 @@ func _draw() -> void:
 	input_handler.custom_minimum_size.x = label.custom_minimum_size.x
 	input_handler.rotation = label_pivot.rotation
 	
-	draw_line(center1 - position, center2 - position, Color.WHITE, 2)
+	var point1 := center1 - position
+	var point2 := center2 - position
+	draw_line(point1, point2, Color.WHITE, 2)
+	
+	if not draw_selection:
+		return
+	
+	var selection_color := Color.WHITE
+	
+	var dir := point1.direction_to(point2)
+	point1 += dir * 48
+	point2 -= dir * 48
+	
+	dir = dir.rotated(PI * 0.5) * 8
+	draw_line(point1 + dir, point2 + dir, selection_color, -1)
+	draw_line(point1 - dir, point2 - dir, selection_color, -1)

@@ -1,6 +1,10 @@
 @tool
 extends EditorDock
 
+enum Mode { SELECT, RECONNECT, STYLE }
+
+@export var tool_group: ButtonGroup
+
 @onready var graph_select: OptionButton = %GraphSelect
 @onready var graph_dialog: AcceptDialog = %GraphDialog
 @onready var graph_list: Tree = %GraphList
@@ -13,6 +17,8 @@ extends EditorDock
 @onready var node_settings: VBoxContainer = %NodeSettings
 @onready var connection_settings: VBoxContainer = %ConnectionSettings
 
+var current_mode: int = Mode.SELECT
+
 var map_path: String
 var graphs: Array[MindGraph]
 var active_graph: MindGraph
@@ -20,8 +26,31 @@ var active_graph: MindGraph
 var panning_from := Vector2.INF
 var panning_origin: Vector2
 
-var selected_node: Control
-var selected_connection: Node2D
+var selected_node: Control:
+	set(sn):
+		if selected_node == sn:
+			return
+		
+		if selected_node:
+			selected_node.draw_selection = false
+			selected_node.queue_redraw()
+		selected_node = sn
+		if selected_node:
+			selected_node.draw_selection = true
+			selected_node.queue_redraw()
+
+var selected_connection: Node2D:
+	set(sc):
+		if selected_connection == sc:
+			return
+		
+		if selected_connection:
+			selected_connection.draw_selection = false
+			selected_connection.queue_redraw()
+		selected_connection = sc
+		if selected_connection:
+			selected_connection.draw_selection = true
+			selected_connection.queue_redraw()
 
 func update_graph_list():
 	graph_select.clear()
@@ -47,6 +76,7 @@ func set_active_graph(graph: MindGraph):
 func create_node() -> Control:
 	var node: Control = preload("uid://c3hsdtwaq6jig").instantiate()
 	node.reset_size()
+	node.check_edit = _can_edit
 	node.selected.connect(_on_node_selected.bind(node))
 	node.connected.connect(_attempt_connection.bind(node))
 	return node
@@ -92,6 +122,8 @@ func _ready() -> void:
 	graph_dialog.hide()
 	set_active_settings(null)
 	
+	tool_group.pressed.connect(_on_tool_changed)
+	
 	if not FileAccess.file_exists(map_path):
 		var default_graph := MindGraph.new()
 		default_graph.name = "New Graph"
@@ -134,6 +166,17 @@ func _unhandled_input(event: InputEvent) -> void:
 	if k and not k.pressed:
 		if k.keycode == KEY_S:
 			save_map()
+
+func _on_tool_changed(tool: Button) -> void:
+	current_mode = tool.get_index()
+	
+	if current_mode == Mode.SELECT:
+		if selected_node:
+			set_active_settings(node_settings)
+		elif selected_connection:
+			set_active_settings(connection_settings)
+	else:
+		set_active_settings(null)
 
 func _on_add_node() -> void:
 	var node := create_node()
@@ -193,12 +236,32 @@ func _on_graph_selected(index: int) -> void:
 	set_active_graph(graphs[index])
 
 func _on_node_selected(node: Control):
+	if selected_node == node:
+		return
+	
+	if selected_node:
+		match current_mode:
+			Mode.RECONNECT:
+				_attempt_connection(node)
+				return
+			
+			Mode.STYLE:
+				node.copy_style(selected_node)
+				return
+	
 	selected_node = node
 	selected_connection = null
 	node_settings.set_node(node)
-	set_active_settings(node_settings)
+	
+	if current_mode == Mode.SELECT:
+		set_active_settings(node_settings)
+	else:
+		set_active_settings(null)
 
 func _on_connection_selected(connection: Node2D):
+	if selected_connection == connection:
+		return
+	
 	selected_node = null
 	selected_connection = connection
 	connection_settings.set_connection(connection)
@@ -216,6 +279,9 @@ func _attempt_connection(to_node: Control):
 	var connection := create_connection(selected_node, to_node)
 	active_graph.connections.append(connection)
 	connection_transform.add_child(connection)
+
+func _can_edit() -> bool:
+	return current_mode == Mode.SELECT
 
 func _on_canvas_gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton

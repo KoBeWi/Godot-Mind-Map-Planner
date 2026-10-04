@@ -6,9 +6,23 @@
 [ext_resource type="Script" uid="uid://cbe0aimqvkse5" path="res://addons/MindMapPlanner/ConnectionSettings.gd" id="4_xfbje"]
 [ext_resource type="Script" uid="uid://c4t2vfqp4dnuo" path="res://addons/MindMapPlanner/ReorderingTree.gd" id="5_xylo7"]
 
+[sub_resource type="ButtonGroup" id="ButtonGroup_hednn"]
+
 [sub_resource type="ImageTexture" id="ImageTexture_43nvq"]
 script = ExtResource("1_54pab")
 icon_name = &"Add"
+
+[sub_resource type="ImageTexture" id="ImageTexture_xylo7"]
+script = ExtResource("1_54pab")
+icon_name = &"ToolSelect"
+
+[sub_resource type="ImageTexture" id="ImageTexture_bhl2i"]
+script = ExtResource("1_54pab")
+icon_name = &"ToolConnect"
+
+[sub_resource type="ImageTexture" id="ImageTexture_r5hdv"]
+script = ExtResource("1_54pab")
+icon_name = &"ColorPick"
 
 [sub_resource type="ImageTexture" id="ImageTexture_s5850"]
 script = ExtResource("1_54pab")
@@ -44,6 +58,7 @@ icon_name = &"AtlasTexture"
 default_slot = 11
 available_layouts = 14
 script = ExtResource("1_eaywk")
+tool_group = SubResource("ButtonGroup_hednn")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1140561842]
 layout_mode = 2
@@ -63,6 +78,41 @@ text = "Connect to Previous"
 [node name="CheckBox2" type="CheckBox" parent="VBoxContainer/HBoxContainer" unique_id=1214919024]
 layout_mode = 2
 text = "Copy Last Style"
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/HBoxContainer" unique_id=1105722663]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/HBoxContainer" unique_id=4763731]
+layout_mode = 2
+theme_type_variation = &"PanelContainerButtonGroup"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/PanelContainer" unique_id=1036376621]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/PanelContainer/HBoxContainer" unique_id=1947697454]
+layout_mode = 2
+tooltip_text = "Select Mode"
+theme_type_variation = &"FlatButton"
+toggle_mode = true
+button_pressed = true
+button_group = SubResource("ButtonGroup_hednn")
+icon = SubResource("ImageTexture_xylo7")
+
+[node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer/PanelContainer/HBoxContainer" unique_id=2002547332]
+layout_mode = 2
+tooltip_text = "Reconnect Mode"
+theme_type_variation = &"FlatButton"
+toggle_mode = true
+button_group = SubResource("ButtonGroup_hednn")
+icon = SubResource("ImageTexture_bhl2i")
+
+[node name="Button3" type="Button" parent="VBoxContainer/HBoxContainer/PanelContainer/HBoxContainer" unique_id=613172924]
+layout_mode = 2
+tooltip_text = "Style Copy Mode"
+theme_type_variation = &"FlatButton"
+toggle_mode = true
+button_group = SubResource("ButtonGroup_hednn")
+icon = SubResource("ImageTexture_r5hdv")
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1529592123]
 layout_mode = 2
