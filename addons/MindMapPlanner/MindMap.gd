@@ -7,8 +7,6 @@ enum Mode { SELECT, RECONNECT, STYLE }
 
 @onready var graph_select: OptionButton = %GraphSelect
 @onready var graph_dialog: AcceptDialog = %GraphDialog
-@onready var graph_list: Tree = %GraphList
-@onready var remove_graph_button: Button = %RemoveGraphButton
 
 @onready var node_transform: Node2D = %NodeTransform
 @onready var connection_transform: Node2D = %ConnectionTransform
@@ -16,6 +14,8 @@ enum Mode { SELECT, RECONNECT, STYLE }
 @onready var setting_container: PanelContainer = %SettingContainer
 @onready var node_settings: VBoxContainer = %NodeSettings
 @onready var connection_settings: VBoxContainer = %ConnectionSettings
+
+var save_shortcut: Shortcut
 
 var current_mode: int = Mode.SELECT
 
@@ -119,6 +119,7 @@ func _ready() -> void:
 	if is_part_of_edited_scene():
 		return
 	
+	save_shortcut = EditorInterface.get_editor_settings().get_shortcut("script_editor/save")
 	graph_dialog.hide()
 	set_active_settings(null)
 	
@@ -149,11 +150,7 @@ func _ready() -> void:
 			
 			graphs.append(mind_graph)
 	
-	graph_list.create_item()
-	for graph in graphs:
-		var graph_item := graph_list.create_item()
-		graph_item.set_text(0, graph.name)
-		graph_item.set_editable(0, true)
+	graph_dialog.load_graphs(graphs)
 	
 	set_active_graph(graphs[0])
 	update_graph_list()
@@ -162,10 +159,10 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
 	
-	var k := event as InputEventKey
-	if k and not k.pressed:
-		if k.keycode == KEY_S:
-			save_map()
+	if save_shortcut.matches_event(event):
+		save_map()
+		EditorInterface.get_editor_toaster().push_toast("MindMap saved.")
+		accept_event()
 
 func _on_tool_changed(tool: Button) -> void:
 	current_mode = tool.get_index()
@@ -191,46 +188,12 @@ func _on_add_node() -> void:
 		connection_transform.add_child(connection)
 
 func _manage_graphs() -> void:
-	remove_graph_button.disabled = true
 	graph_dialog.popup_centered()
-
-func _update_remove_button() -> void:
-	remove_graph_button.disabled = not graph_list.get_selected() or graph_list.get_root().get_child_count() == 1
-
-func _add_graph() -> void:
-	var graph := MindGraph.new()
-	graph.name = "New Graph"
-	graphs.append(graph)
-	
-	var item := graph_list.create_item()
-	item.set_text(0, graph.name)
-	item.set_editable(0, true)
-
-func _delete_graph() -> void:
-	var item := graph_list.get_selected()
-	if not item:
-		return
-	graphs.remove_at(item.get_index())
-	item.free()
-
-func _on_graph_list_item_edited() -> void:
-	var item := graph_list.get_edited()
-	if not item:
-		return
-	
-	graphs[item.get_index()].name = item.get_text(0)
 
 func _on_graph_dialog_visibility_changed() -> void:
 	if not graph_dialog or graph_dialog.visible:
 		return
 	update_graph_list()
-	graph_list.deselect_all()
-
-func _on_graph_list_reordered(from: int, to: int) -> void:
-	var graph := graphs[from]
-	graphs.remove_at(from)
-	
-	graphs.insert(to, graph)
 
 func _on_graph_selected(index: int) -> void:
 	set_active_graph(graphs[index])
