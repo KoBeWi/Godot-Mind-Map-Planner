@@ -6,11 +6,15 @@ const MindGraph = preload("uid://dyjdl348y6pt4").MindGraph
 enum ButtonID { EDIT_GRAPH, REMOVE_GRAPH }
 
 @onready var graph_list: Tree = %GraphList
+@onready var graph_options: PanelContainer = %GraphOptions
 
 var graphs: Array[MindGraph]
 
 func _ready() -> void:
 	graph_list.create_item()
+	
+	if not is_part_of_edited_scene():
+		graph_options.hide()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED:
@@ -44,7 +48,7 @@ func _on_graph_list_button_clicked(item: TreeItem, column: int, id: int, mouse_b
 
 	match id:
 		ButtonID.EDIT_GRAPH:
-			pass
+			graph_options.show()
 		
 		ButtonID.REMOVE_GRAPH:
 			graphs.remove_at(item.get_index())

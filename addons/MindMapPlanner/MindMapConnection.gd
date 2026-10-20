@@ -1,6 +1,8 @@
 @tool
 extends Node2D
 
+const MindMapNode = preload("uid://btpjyefksrvnx")
+
 enum End { NONE, ARROW, DOUBLE_ARROW, DIAMOND, CIRCLE }
 enum Style { CONTINUOUS, DASHED, DOTTED }
 
@@ -10,8 +12,8 @@ var label: Label
 
 var draw_selection: bool
 
-var node1: Control
-var node2: Control
+var node1: MindMapNode
+var node2: MindMapNode
 
 var text_color := Color.WHITE:
 	set(tc):
@@ -48,6 +50,16 @@ func set_data(data: Dictionary) -> void:
 	style = data["style"]
 	thickness = data["thickness"]
 
+func draw_end_texture(frame: int, pos: Vector2, rot: float):
+	const END_TEXTURE = preload("uid://rcg0kx1eexub")
+	var frame_size := Vector2(100, 100)
+	var ratio := 0.25 + thickness * (0.05 * 0.75)
+	var draw_size := frame_size * ratio
+	
+	draw_set_transform(pos, rot, Vector2.ONE)
+	draw_texture_rect_region(END_TEXTURE, Rect2(-draw_size * Vector2(0.9, 0.5), draw_size), Rect2(Vector2(frame * frame_size.x, 0), frame_size), color)
+	draw_set_transform_matrix(Transform2D())
+
 func _ready() -> void:
 	if not is_part_of_edited_scene():
 		node1.changed.connect(queue_redraw)
@@ -82,19 +94,27 @@ func _draw() -> void:
 	input_handler.custom_minimum_size.x = label.custom_minimum_size.x
 	input_handler.rotation = label_pivot.rotation
 	
-	var point1 := center1 - position
-	var point2 := center2 - position
+	var direction := (position - center1).normalized()
+	var point1 := center1 + node1.get_tangent_point(direction) - position
+	var point2 := center2 + node2.get_tangent_point(-direction) - position
+	
+	if end1 > 0:
+		draw_end_texture(end1 - 1, point1, point1.angle())
+		point1 += direction * 32 ## rozmiar textury
+	
+	if end2 > 0:
+		draw_end_texture(end2 - 1, point2, point2.angle())
+		point2 -= direction * 32
+	
 	draw_line(point1, point2, color, thickness)
 	
-	if not draw_selection:
-		return
-	
-	var selection_color := Color.WHITE
-	
-	var dir := point1.direction_to(point2)
-	point1 += dir * 48
-	point2 -= dir * 48
-	
-	dir = dir.rotated(PI * 0.5) * 8
-	draw_line(point1 + dir, point2 + dir, selection_color, -1)
-	draw_line(point1 - dir, point2 - dir, selection_color, -1)
+	if draw_selection:
+		var selection_color := Color.WHITE
+		
+		var dir := point1.direction_to(point2)
+		point1 += dir * 48
+		point2 -= dir * 48
+		
+		dir = dir.rotated(PI * 0.5) * 8
+		draw_line(point1 + dir, point2 + dir, selection_color, -1)
+		draw_line(point1 - dir, point2 - dir, selection_color, -1)

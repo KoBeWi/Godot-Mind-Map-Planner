@@ -78,6 +78,14 @@ func copy_style(from: Control):
 	node_size = from.node_size
 	queue_redraw()
 
+func get_tangent_point(direction: Vector2) -> Vector2:
+	match shape:
+		Shape.CIRCLE:
+			var radius := maxf(size.x, size.y) * 0.5
+			return direction * radius
+	
+	return Vector2()
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
 		label = %Label
