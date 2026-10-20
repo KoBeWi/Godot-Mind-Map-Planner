@@ -3,7 +3,7 @@ extends Node2D
 
 const MindMapNode = preload("uid://btpjyefksrvnx")
 
-enum End { NONE, ARROW, DOUBLE_ARROW, DIAMOND, CIRCLE }
+enum End { NONE = -1, ARROW, DOUBLE_ARROW, DIAMOND, CIRCLE }
 enum Style { CONTINUOUS, DASHED, DOTTED }
 
 var label: Label
@@ -63,7 +63,9 @@ func draw_end_texture(frame: int, pos: Vector2, rot: float):
 func _ready() -> void:
 	if not is_part_of_edited_scene():
 		node1.changed.connect(queue_redraw)
+		node1.draw.connect(queue_redraw)
 		node2.changed.connect(queue_redraw)
+		node2.draw.connect(queue_redraw)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
@@ -98,23 +100,30 @@ func _draw() -> void:
 	var point1 := center1 + node1.get_tangent_point(direction) - position
 	var point2 := center2 + node2.get_tangent_point(-direction) - position
 	
-	if end1 > 0:
-		draw_end_texture(end1 - 1, point1, point1.angle())
+	if end1 != End.NONE:
+		draw_end_texture(end1, point1, point1.angle())
 		point1 += direction * 32 ## rozmiar textury
 	
-	if end2 > 0:
-		draw_end_texture(end2 - 1, point2, point2.angle())
+	if end2 != End.NONE:
+		draw_end_texture(end2, point2, point2.angle())
 		point2 -= direction * 32
 	
-	draw_line(point1, point2, color, thickness)
+	if style == Style.CONTINUOUS:
+		draw_line(point1, point2, color, thickness)
+	elif style == Style.DASHED:
+		draw_line(point1, point2, color, thickness)
+	elif style == Style.DOTTED:
+		draw_line(point1, point2, color, thickness)
 	
-	if draw_selection:
-		var selection_color := Color.WHITE
-		
-		var dir := point1.direction_to(point2)
-		point1 += dir * 48
-		point2 -= dir * 48
-		
-		dir = dir.rotated(PI * 0.5) * 8
-		draw_line(point1 + dir, point2 + dir, selection_color, -1)
-		draw_line(point1 - dir, point2 - dir, selection_color, -1)
+	if not draw_selection:
+		return
+	
+	var selection_color := Color.WHITE
+	
+	var dir := point1.direction_to(point2)
+	point1 += dir * 48
+	point2 -= dir * 48
+	
+	dir = dir.rotated(PI * 0.5) * 8
+	draw_line(point1 + dir, point2 + dir, selection_color, -1)
+	draw_line(point1 - dir, point2 - dir, selection_color, -1)

@@ -160,7 +160,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if save_shortcut.matches_event(event):
-		#save_map() ## TODO uncomment
+		save_map() ## TODO uncomment
 		EditorInterface.get_editor_toaster().push_toast("MindMap saved.")
 		accept_event()
 

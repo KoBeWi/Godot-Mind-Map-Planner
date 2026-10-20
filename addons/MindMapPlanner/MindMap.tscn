@@ -275,6 +275,7 @@ text = "Text Color"
 unique_name_in_owner = true
 layout_mode = 2
 color = Color(1, 1, 1, 1)
+edit_alpha = false
 
 [node name="Label2" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=1427657007]
 layout_mode = 2
@@ -290,11 +291,11 @@ popup/item_0/id = 0
 popup/item_1/text = "Arrow"
 popup/item_1/id = 1
 popup/item_2/text = "Double Arrow"
-popup/item_2/id = 4
+popup/item_2/id = 2
 popup/item_3/text = "Diamond"
-popup/item_3/id = 2
+popup/item_3/id = 3
 popup/item_4/text = "Circle"
-popup/item_4/id = 3
+popup/item_4/id = 4
 
 [node name="Label5" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=79336442]
 layout_mode = 2
@@ -311,6 +312,7 @@ text = "Color"
 [node name="LineColor" type="ColorPickerButton" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=935824958]
 unique_name_in_owner = true
 layout_mode = 2
+edit_alpha = false
 
 [node name="Label6" type="Label" parent="VBoxContainer/Canvas/SettingContainer/ConnectionSettings/GridContainer" unique_id=1551768310]
 layout_mode = 2
