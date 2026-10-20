@@ -24,19 +24,22 @@ var text_color := Color.BLACK:
 	set(tc):
 		text_color = tc
 		label.add_theme_color_override(&"font_color", tc)
+		line_edit_dirty = true
 
 var node_size := 14:
 	set(s):
 		node_size = s
 		rounded_sb = null
 		label.add_theme_font_size_override(&"font_size", s)
-		reset_size()
+		line_edit_dirty = true
+		reset_size.call_deferred()
 
 var dragging_from := Vector2.INF
 var dragging_origin: Vector2
 var dragging_active: bool
 var rounded_sb: StyleBoxFlat
 
+var line_edit_dirty := true
 var try_select: bool
 
 signal selected
@@ -90,7 +93,15 @@ func _gui_input(event: InputEvent) -> void:
 						return
 					
 					line_edit.text = label.text
-					label.hide()
+					if line_edit_dirty:
+						line_edit.begin_bulk_theme_override()
+						line_edit.add_theme_font_size_override(&"font_size", node_size)
+						line_edit.add_theme_color_override(&"font_color", text_color)
+						line_edit.add_theme_color_override(&"caret_color", text_color)
+						line_edit.end_bulk_theme_override()
+						line_edit_dirty = false
+					
+					label.modulate.a = 0
 					line_edit.show()
 					line_edit.edit()
 					line_edit.select_all()
@@ -140,11 +151,12 @@ func _draw() -> void:
 				draw_circle(size * 0.5, maxf(size.x, size.y) * 0.5 + 8, selection_color, false)
 		
 		Shape.OVAL:
-			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, color)
-			draw_ellipse(size * 0.5, size.x * 0.5, size.y * 0.5, border_color, false, border_size)
+			var oval_size := Vector2(size.x, size.y + size.x * 0.2)
+			draw_ellipse(size * 0.5, oval_size.x * 0.5, oval_size.y * 0.5, color)
+			draw_ellipse(size * 0.5, oval_size.x * 0.5, oval_size.y * 0.5, border_color, false, border_size)
 			
 			if draw_selection:
-				draw_ellipse(size * 0.5, size.x * 0.5 + 8, size.y * 0.5 + 8, selection_color, false)
+				draw_ellipse(size * 0.5, oval_size.x * 0.5 + 8, oval_size.y * 0.5 + 8, selection_color, false)
 		
 		Shape.RECT:
 			draw_rect(Rect2(Vector2(), size), color)
@@ -167,10 +179,10 @@ func _draw() -> void:
 		
 		Shape.PARRALLELOGRAM:
 			var polygon: PackedVector2Array = [
-				Vector2(size.x * 0.15, 0),
-				Vector2(size.x, 0),
-				Vector2(size.x * 0.85, size.y),
-				Vector2(0, size.y)
+				Vector2(0, 0),
+				Vector2(size.x * 1.15, 0),
+				Vector2(size.x, size.y),
+				Vector2(-size.x * 0.15, size.y)
 			]
 			draw_polygon(polygon, [color])
 			
@@ -178,20 +190,14 @@ func _draw() -> void:
 			draw_polyline(polygon, border_color, border_size)
 			
 			if draw_selection:
-				for i in 4:
-					var p := polygon[i]
-					p += (p - size * 0.5).normalized() * 8
-					polygon[i] = p
-				
-				polygon[4] = polygon[0]
-				draw_polyline(polygon, selection_color)
+				draw_rect(Rect2(polygon[3].x - 8, polygon[0].y - 8, polygon[1].x - polygon[3].x + 16, polygon[2].y - polygon[0].y + 16), selection_color, false)
 		
 		Shape.RHOMB:
 			var polygon: PackedVector2Array = [
-				Vector2(0, size.y * 0.5),
-				Vector2(size.x * 0.5, 0),
-				Vector2(size.x, size.y * 0.5),
-				Vector2(size.x * 0.5, size.y)
+				Vector2(-node_size, size.y * 0.5),
+				Vector2(size.x * 0.5, -node_size - size.x * 0.2),
+				Vector2(size.x + node_size, size.y * 0.5),
+				Vector2(size.x * 0.5, size.y + node_size + size.x * 0.2)
 			]
 			draw_polygon(polygon, [color])
 			
@@ -199,13 +205,7 @@ func _draw() -> void:
 			draw_polyline(polygon, border_color, border_size)
 			
 			if draw_selection:
-				for i in 4:
-					var p := polygon[i]
-					p += (p - size * 0.5).normalized() * 8
-					polygon[i] = p
-				
-				polygon[4] = polygon[0]
-				draw_polyline(polygon, selection_color)
+				draw_rect(Rect2(polygon[0].x - 8, polygon[1].y - 8, polygon[2].x - polygon[0].x + 16, polygon[3].y - polygon[1].y + 16), selection_color, false)
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:
@@ -214,12 +214,16 @@ func _end_edit(accepted := true) -> void:
 	if accepted:
 		label.text = line_edit.text
 	
-	label.show()
+	label.modulate.a = 1
 	line_edit.hide()
 
 func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
 	if not toggled_on:
 		_end_edit(not Input.is_action_pressed(&"ui_cancel"))
+
+func _on_line_edit_text_changed(new_text: String) -> void:
+	label.text = new_text
+	reset_size()
 
 func _on_line_edit_text_submitted(new_text: String) -> void:
 	_end_edit()

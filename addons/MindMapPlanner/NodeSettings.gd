@@ -22,6 +22,7 @@ func set_node(n: Control):
 
 func _on_text_edit_text_changed(new_text: String) -> void:
 	node.label.text = new_text
+	node.reset_size()
 
 func _on_shape_button_item_selected(index: int) -> void:
 	node.shape = index
