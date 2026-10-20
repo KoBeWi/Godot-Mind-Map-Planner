@@ -88,10 +88,7 @@ func _gui_input(event: InputEvent) -> void:
 	if mb:
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			if mb.pressed:
-				if mb.double_click:
-					if not check_edit.call():
-						return
-					
+				if mb.double_click and check_edit.call():
 					line_edit.text = label.text
 					if line_edit_dirty:
 						line_edit.begin_bulk_theme_override()
