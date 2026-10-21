@@ -53,12 +53,15 @@ func set_data(data: Dictionary) -> void:
 func draw_end_texture(frame: int, pos: Vector2, rot: float):
 	const END_TEXTURE = preload("uid://rcg0kx1eexub")
 	var frame_size := Vector2(100, 100)
-	var ratio := 0.25 + thickness * (0.05 * 0.75)
+	var ratio := get_texture_scale()
 	var draw_size := frame_size * ratio
 	
 	draw_set_transform(pos, rot, Vector2.ONE)
 	draw_texture_rect_region(END_TEXTURE, Rect2(-draw_size * Vector2(0.9, 0.5), draw_size), Rect2(Vector2(frame * frame_size.x, 0), frame_size), color)
 	draw_set_transform_matrix(Transform2D())
+
+func get_texture_scale() -> float:
+	return 0.25 + thickness * (0.05 * 0.75)
 
 func _ready() -> void:
 	if not is_part_of_edited_scene():
@@ -111,9 +114,21 @@ func _draw() -> void:
 	if style == Style.CONTINUOUS:
 		draw_line(point1, point2, color, thickness)
 	elif style == Style.DASHED:
-		draw_line(point1, point2, color, thickness)
+		var dash_size := thickness * 8
+		var segments: int = point1.distance_to(point2) / dash_size
+		
+		if segments > 0:
+			for i in segments:
+				if i % 2 == 0:
+					draw_line(point1 + direction * i * dash_size, point1 + direction * (i + 1) * dash_size, color, thickness)
+		else:
+			draw_line(point1, point2, color, thickness)
 	elif style == Style.DOTTED:
-		draw_line(point1, point2, color, thickness)
+		var dot_radius := thickness * 0.5
+		var segments: int = point1.distance_to(point2) / (dot_radius * 4)
+		
+		for i in segments:
+			draw_circle(point1 + direction * i * dot_radius * 4, dot_radius, color)
 	
 	if not draw_selection:
 		return
