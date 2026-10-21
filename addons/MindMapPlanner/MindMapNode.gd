@@ -80,6 +80,32 @@ func copy_style(from: Control):
 
 func get_tangent_point(direction: Vector2) -> Vector2:
 	match shape:
+		Shape.RECT, Shape.ROUND_RECT:
+			var extents := size * 0.5
+			var x := 0
+			var y := 0
+			
+			if direction.x < 0:
+				y = Geometry2D.line_intersects_line(-extents, Vector2.DOWN, Vector2(), direction).y
+			elif direction.x > 0:
+				y = Geometry2D.line_intersects_line(extents, Vector2.UP, Vector2(), direction).y
+			
+			if direction.y < 0:
+				x = Geometry2D.line_intersects_line(-extents, Vector2.RIGHT, Vector2(), direction).x
+			elif direction.y > 0:
+				x = Geometry2D.line_intersects_line(extents, Vector2.LEFT, Vector2(), direction).x
+			
+			return Vector2(clampf(x, -extents.x, extents.x), clampf(y, -extents.y, extents.y))
+		
+		Shape.PARRALLELOGRAM:
+			pass
+		
+		Shape.RHOMB:
+			pass
+		
+		Shape.OVAL:
+			pass
+		
 		Shape.CIRCLE:
 			var radius := maxf(size.x, size.y) * 0.5
 			return direction * radius
