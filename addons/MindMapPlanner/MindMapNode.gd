@@ -5,7 +5,7 @@ enum Shape { RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 
 var label: Label
 var line_edit: LineEdit
-var graph
+var graph: MindMap.MindGraph
 
 var check_edit: Callable
 var draw_selection: bool
@@ -48,36 +48,40 @@ signal connected
 signal changed
 
 func get_data() -> Dictionary:
+	var defaults := graph.default_node
+	
 	var data: Dictionary
 	data.position = position + size * 0.5
 	if not label.text.is_empty():
 		data.text = label.text
-	if not text_color.is_equal_approx(graph.default_node.text_color):
+	if not text_color.is_equal_approx(defaults.text_color):
 		data.text_color = text_color.to_html(false)
-	if not color.is_equal_approx(graph.default_node.color):
+	if not color.is_equal_approx(defaults.color):
 		data.color = color.to_html(false)
-	if not border_color.is_equal_approx(graph.default_node.border_color):
+	if not border_color.is_equal_approx(defaults.border_color):
 		data.border_color = border_color.to_html(false)
-	if shape != graph.default_node.shape:
+	if shape != defaults.shape:
 		data.shape = shape
-	if node_size != graph.default_node.node_size:
+	if node_size != defaults.node_size:
 		data.size = node_size
 	return data
 
 func set_data(data: Dictionary) -> void:
+	var defaults := graph.default_node
+	
 	var pos: String = data["position"].substr(1)
 	position.x = pos.get_slice(",", 0).to_float()
 	position.y = pos.get_slice(",", 1).to_float()
 	label.text = data.get("text", "")
-	text_color = Color(data.get("text_color", graph.default_node.text_color))
-	color = Color(data.get("color", graph.default_node.color))
-	border_color = Color(data.get("border_color", graph.default_node.border_color))
-	shape = data.get("shape", graph.default_node.shape)
-	node_size = data.get("size", graph.default_node.node_size)
+	text_color = Color(data.get("text_color", defaults.text_color))
+	color = Color(data.get("color", defaults.color))
+	border_color = Color(data.get("border_color", defaults.border_color))
+	shape = data.get("shape", defaults.shape)
+	node_size = data.get("size", defaults.node_size)
 	
 	reset_size()
 
-func copy_style(from: Control):
+func copy_style(from: MindMap.MindNode):
 	text_color = from.text_color
 	color = from.color
 	border_color = from.border_color
@@ -200,7 +204,10 @@ func _gui_input(event: InputEvent) -> void:
 		accept_event()
 
 func _draw() -> void:
-	var selection_color: Color = graph.selection_color
+	if is_part_of_edited_scene():
+		return
+	
+	var selection_color := graph.selection_color
 	
 	var border_size := node_size / 7
 	match shape:

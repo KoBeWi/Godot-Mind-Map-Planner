@@ -1,20 +1,18 @@
 @tool
 extends Node2D
 
-const MindMapNode = preload("uid://btpjyefksrvnx")
-
 enum End { NONE = -1, ARROW, DOUBLE_ARROW, DIAMOND, CIRCLE }
 enum Style { CONTINUOUS, DASHED, DOTTED }
 
 var label: Label
-@onready var label_pivot: Node2D = %LabelPivot
-@onready var input_handler: Control = %InputHandler
-var graph
+var label_pivot: Node2D
+var input_handler: Control
+var graph: MindMap.MindGraph
 
 var draw_selection: bool
 
-var node1: MindMapNode
-var node2: MindMapNode
+var node1: MindMap.MindNode
+var node2: MindMap.MindNode
 
 var text_color := Color.WHITE:
 	set(tc):
@@ -81,6 +79,8 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
 		label = %Label
+		label_pivot = %LabelPivot
+		input_handler = %InputHandler
 
 func _on_input_handler_gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
@@ -141,7 +141,7 @@ func _draw() -> void:
 	if not draw_selection:
 		return
 	
-	var selection_color: Color = graph.selection_color
+	var selection_color := graph.selection_color
 	
 	var dir := point1.direction_to(point2)
 	point1 += dir * 48

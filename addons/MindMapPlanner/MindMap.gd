@@ -30,7 +30,7 @@ var active_graph: MindGraph
 var panning_from := Vector2.INF
 var panning_origin: Vector2
 
-var selected_node: Control:
+var selected_node: MindMap.MindNode:
 	set(sn):
 		if selected_node == sn:
 			return
@@ -43,7 +43,7 @@ var selected_node: Control:
 			selected_node.draw_selection = true
 			selected_node.queue_redraw()
 
-var selected_connection: Node2D:
+var selected_connection: MindMap.MindConnection:
 	set(sc):
 		if selected_connection == sc:
 			return
@@ -56,7 +56,7 @@ var selected_connection: Node2D:
 			selected_connection.draw_selection = true
 			selected_connection.queue_redraw()
 
-var last_selected: Control
+var last_selected: MindMap.MindNode
 
 func update_graph_list():
 	graph_select.clear()
@@ -84,16 +84,16 @@ func set_active_graph(graph: MindGraph):
 	active_graph = graph
 	canvas.color = active_graph.background_color
 
-func create_node() -> Control:
-	var node: Control = preload("uid://c3hsdtwaq6jig").instantiate()
+func create_node() -> MindMap.MindNode:
+	var node: MindMap.MindNode = preload("uid://c3hsdtwaq6jig").instantiate()
 	node.reset_size()
 	node.check_edit = _can_edit
 	node.selected.connect(_on_node_selected.bind(node))
 	node.connected.connect(_attempt_connection.bind(node))
 	return node
 
-func create_connection(node1: Node, node2: Node) -> Node2D:
-	var connection: Node2D = preload("uid://b64kn0iru4hto").instantiate()
+func create_connection(node1: MindMap.MindNode, node2: MindMap.MindNode) -> MindMap.MindConnection:
+	var connection: MindMap.MindConnection = preload("uid://b64kn0iru4hto").instantiate()
 	connection.node1 = node1
 	connection.node2 = node2
 	connection.selected.connect(_on_connection_selected.bind(connection))
@@ -107,9 +107,14 @@ func set_active_settings(settings: Control):
 func save_map():
 	var data: Array[Dictionary]
 	
+	for index in 10:
+		print(index)
+	
 	for graph in graphs:
 		var graph_data: Dictionary[String, Variant]
 		graph_data["name"] = graph.name
+		graph_data["background_color"] = graph.background_color
+		graph_data["selection_color"] = graph.selection_color
 		
 		var nodes: Array[Dictionary]
 		for node in graph.nodes:
@@ -117,8 +122,8 @@ func save_map():
 		graph_data["nodes"] = nodes
 		
 		var connections: Array[Dictionary]
-		for node in graph.connections:
-			connections.append(node.get_data())
+		for connection in graph.connections:
+			connections.append(connection.get_data())
 		graph_data["connections"] = connections
 		
 		data.append(graph_data)
@@ -147,13 +152,13 @@ func _ready() -> void:
 			var mind_graph := MindGraph.new()
 			mind_graph.name = graph["name"]
 			
-			for node_data in graph["nodes"]:
+			for node_data: Dictionary in graph["nodes"]:
 				var node := create_node()
 				node.graph = mind_graph
 				node.set_data(node_data)
 				mind_graph.nodes.append(node)
 			
-			for connection_data in graph["connections"]:
+			for connection_data: Dictionary in graph["connections"]:
 				var node1 := mind_graph.nodes[connection_data["node1"]]
 				var node2 := mind_graph.nodes[connection_data["node2"]]
 				var connection := create_connection(node1, node2)
@@ -334,11 +339,11 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 
 class MindGraph:
 	var name: String
-	var nodes: Array[Node]
-	var connections: Array[Node]
+	var nodes: Array[MindMap.MindNode]
+	var connections: Array[MindMap.MindConnection]
 	
-	var default_node: Control
-	var default_connection: Node2D
+	var default_node: MindMap.MindNode
+	var default_connection: MindMap.MindConnection
 	
 	var background_color := Color("29282e")
 	var selection_color := Color.WHITE

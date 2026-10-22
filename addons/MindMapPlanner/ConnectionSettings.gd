@@ -9,7 +9,7 @@ extends Control
 @onready var line_style: OptionButton = %LineStyle
 @onready var thickness: SpinBox = %Thickness
 
-var connection: Node2D
+var connection: MindMap.MindConnection
 
 func _ready() -> void:
 	if is_part_of_edited_scene():
@@ -22,7 +22,7 @@ func _ready() -> void:
 		end2.set_item_id(i, id)
 	end2.selected = 0
 
-func set_connection(c: Node2D):
+func set_connection(c: MindMap.MindConnection):
 	connection = c
 	
 	label_edit.text = connection.label.text

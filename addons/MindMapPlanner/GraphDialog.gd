@@ -1,8 +1,6 @@
 @tool
 extends AcceptDialog
 
-const MindGraph = preload("uid://dyjdl348y6pt4").MindGraph
-
 enum ButtonID { EDIT_GRAPH, REMOVE_GRAPH }
 
 @onready var graph_list: Tree = %GraphList
@@ -12,10 +10,10 @@ enum ButtonID { EDIT_GRAPH, REMOVE_GRAPH }
 @onready var background_color: ColorPickerButton = %BackgroundColor
 @onready var selection_color: ColorPickerButton = %SelectionColor
 
-var graphs: Array[MindGraph]
-var edited_graph: MindGraph
+var graphs: Array[MindMap.MindGraph]
+var edited_graph: MindMap.MindGraph
 
-signal graph_changed(graph: MindGraph)
+signal graph_changed(graph: MindMap.MindGraph)
 
 func _ready() -> void:
 	graph_list.create_item()
@@ -28,7 +26,7 @@ func _notification(what: int) -> void:
 		if not visible:
 			graph_list.deselect_all()
 
-func load_graphs(graph_list: Array[MindGraph]):
+func load_graphs(graph_list: Array[MindMap.MindGraph]):
 	graphs = graph_list
 	for graph in graphs:
 		create_graph_item(graph.name)
@@ -43,7 +41,7 @@ func create_graph_item(text: String):
 	graph_item.set_button_tooltip_text(0, -1, "Remove graph.")
 
 func _add_graph() -> void:
-	var graph := MindGraph.new()
+	var graph := MindMap.MindGraph.new()
 	graph.name = "New Graph"
 	graphs.append(graph)
 	

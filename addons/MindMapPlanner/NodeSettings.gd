@@ -8,9 +8,9 @@ extends Control
 @onready var text_color: ColorPickerButton = %TextColor
 @onready var size_slider: HSlider = %Size
 
-var node: Control
+var node: MindMap.MindNode
 
-func set_node(n: Control):
+func set_node(n: MindMap.MindNode):
 	node = n
 	
 	text_edit.text = node.label.text
