@@ -202,21 +202,6 @@ func _ready() -> void:
 	set_active_graph(graphs[0])
 	update_graph_list()
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not is_visible_in_tree():
-		return
-	
-	if save_shortcut.matches_event(event):
-		save_map()
-		EditorInterface.get_editor_toaster().push_toast("MindMap saved.")
-		accept_event()
-	elif event.is_action(&"ui_undo", true):
-		print("aaaA")
-		accept_event()
-
-func _gui_input(event: InputEvent) -> void:
-	print("aaa")
-
 func _on_tool_changed(tool: Button) -> void:
 	current_mode = tool.get_index()
 	
@@ -328,6 +313,47 @@ func _can_edit() -> bool:
 	return current_mode == Mode.SELECT
 
 func _on_canvas_gui_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k and k.pressed:
+		if not k.echo and save_shortcut.matches_event(event):
+			if last_saved_version != undo_redo.get_version():
+				save_map()
+				accept_event()
+		elif event.is_action(&"ui_graph_delete", true):
+			if selected_node:
+				undo_redo.create_action("Delete Node")
+				
+				var graph := active_graph
+				var node := selected_node
+				var index := graph.nodes.find(node)
+				
+				undo_redo.add_do_method(func():
+					graph.nodes.erase(node)
+					node_transform.remove_child(node))
+				undo_redo.add_undo_method(func():
+					graph.nodes.insert(index, node)
+					node_transform.add_child(node)
+					node_transform.move_child(node, index))
+				undo_redo.add_undo_reference(node)
+				undo_redo.commit_action()
+				
+				selected_node = null
+				set_active_settings(null)
+				accept_event()
+			elif selected_connection:
+				selected_connection.queue_free()
+				accept_event()
+		elif event.is_action(&"ui_undo", true):
+			if undo_redo.undo():
+				print("MindMap undo")
+				accept_event()
+		elif event.is_action(&"ui_redo", true):
+			if undo_redo.redo():
+				print("MindMap redo")
+				accept_event()
+		
+		return
+	
 	var mb := event as InputEventMouseButton
 	if mb:
 		if mb.button_index == MOUSE_BUTTON_MIDDLE:
@@ -371,7 +397,6 @@ func _recenter_view() -> void:
 	if not active_graph.nodes.is_empty():
 		var center_node := active_graph.nodes[0]
 		center = center_node.position + center_node.size * 0.5
-		print(center)
 	
 	center -= canvas.size * 0.5
 	node_transform.position = -center

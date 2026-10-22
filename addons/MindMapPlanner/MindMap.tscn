@@ -165,6 +165,7 @@ unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
 size_flags_vertical = 3
+focus_mode = 2
 color = Color(0.16078432, 0.15686275, 0.18039216, 1)
 
 [node name="ConnectionTransform" type="Node2D" parent="VBoxContainer/Canvas" unique_id=1628555488]
@@ -475,6 +476,7 @@ icon = SubResource("ImageTexture_3smkc")
 [connection signal="item_selected" from="VBoxContainer/HBoxContainer/GraphSelect" to="." method="_on_graph_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button2" to="." method="_manage_graphs"]
 [connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]
+[connection signal="mouse_entered" from="VBoxContainer/Canvas" to="VBoxContainer/Canvas" method="grab_focus"]
 [connection signal="text_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/TextEdit" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_text_edit_text_changed"]
 [connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/ShapeButton" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_shape_button_item_selected"]
 [connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/NodeColor" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_node_color_color_changed"]

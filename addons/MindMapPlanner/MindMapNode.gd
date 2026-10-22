@@ -183,7 +183,9 @@ func _gui_input(event: InputEvent) -> void:
 				var undo_redo := MindMap.MindDock.singleton.undo_redo
 				undo_redo.create_action("Move Node")
 				undo_redo.add_do_property(self, &"position", position)
+				undo_redo.add_do_method(func(): changed.emit())
 				undo_redo.add_undo_property(self, &"position", dragging_origin)
+				undo_redo.add_undo_method(func(): changed.emit())
 				undo_redo.commit_action(false)
 				
 				dragging_from = Vector2.INF
