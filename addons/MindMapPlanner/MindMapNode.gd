@@ -5,6 +5,7 @@ enum Shape { RECT, ROUND_RECT, PARRALLELOGRAM, RHOMB, OVAL, CIRCLE }
 
 var label: Label
 var line_edit: LineEdit
+var graph
 
 var check_edit: Callable
 var draw_selection: bool
@@ -41,7 +42,6 @@ var rounded_sb: StyleBoxFlat
 
 var last_text: String
 var line_edit_dirty := true
-var try_select: bool
 
 signal selected
 signal connected
@@ -168,13 +168,10 @@ func _gui_input(event: InputEvent) -> void:
 					if check_edit.call():
 						dragging_from = mb.global_position
 						dragging_origin = position
-					try_select = true
+					selected.emit()
 			elif not mb.pressed:
 				dragging_from = Vector2.INF
 				dragging_active = false
-				
-				if try_select:
-					selected.emit()
 			
 			accept_event()
 		
@@ -192,13 +189,12 @@ func _gui_input(event: InputEvent) -> void:
 		if not dragging_active and mm.global_position.distance_squared_to(dragging_from) < 64:
 			return
 		dragging_active = true
-		try_select = false
 		position = dragging_origin + (mm.global_position - dragging_from)
 		changed.emit()
 		accept_event()
 
 func _draw() -> void:
-	var selection_color := Color.WHITE
+	var selection_color: Color = graph.selection_color
 	
 	var border_size := node_size / 7
 	match shape:

@@ -10,6 +10,7 @@ enum NewFlags { CONNECT_TO_LAST = 1, COPY_LAST_STYLE = 2 }
 @onready var graph_select: OptionButton = %GraphSelect
 @onready var graph_dialog: AcceptDialog = %GraphDialog
 
+@onready var canvas: ColorRect = %Canvas
 @onready var node_transform: Node2D = %NodeTransform
 @onready var connection_transform: Node2D = %ConnectionTransform
 
@@ -71,12 +72,17 @@ func set_active_graph(graph: MindGraph):
 	for node in connection_transform.get_children():
 		connection_transform.remove_child(node)
 	
+	selected_node = null
+	selected_connection = null
+	set_active_settings(null)
+	
 	for node in graph.nodes:
 		node_transform.add_child(node)
 	for node in graph.connections:
 		connection_transform.add_child(node)
 	
 	active_graph = graph
+	canvas.color = active_graph.background_color
 
 func create_node() -> Control:
 	var node: Control = preload("uid://c3hsdtwaq6jig").instantiate()
@@ -144,6 +150,7 @@ func _ready() -> void:
 			for node_data in graph["nodes"]:
 				var node := create_node()
 				node.set_data(node_data)
+				node.graph = mind_graph
 				mind_graph.nodes.append(node)
 			
 			for connection_data in graph["connections"]:
@@ -151,6 +158,7 @@ func _ready() -> void:
 				var node2 := mind_graph.nodes[connection_data["node2"]]
 				var connection := create_connection(node1, node2)
 				connection.set_data(connection_data)
+				connection.graph = mind_graph
 				mind_graph.connections.append(connection)
 			
 			graphs.append(mind_graph)
@@ -189,11 +197,13 @@ func _on_tool_changed(tool: Button) -> void:
 func _on_add_node() -> void:
 	var node := create_node()
 	node.position = -node_transform.position + size * 0.5 - node.size * 0.5
+	node.graph = active_graph
 	active_graph.nodes.append(node)
 	node_transform.add_child(node)
 	
 	if new_flags & NewFlags.CONNECT_TO_LAST and last_selected:
 		var connection := create_connection(last_selected, node)
+		connection.graph = active_graph
 		active_graph.connections.append(connection)
 		connection_transform.add_child(connection)
 	
@@ -256,6 +266,7 @@ func _attempt_connection(to_node: Control):
 			return
 	
 	var connection := create_connection(selected_node, to_node)
+	connection.graph = active_graph
 	active_graph.connections.append(connection)
 	connection_transform.add_child(connection)
 
@@ -269,6 +280,15 @@ func _on_new_flag_toggled(idx: int):
 		new_flags |= flag
 	else:
 		new_flags ^= flag
+
+func _on_graph_dialog_graph_changed(graph: MindGraph) -> void:
+	if graph == active_graph:
+		canvas.color = graph.background_color
+		if selected_node:
+			selected_node.queue_redraw()
+		
+		if selected_connection:
+			selected_connection.queue_redraw()
 
 func _can_edit() -> bool:
 	return current_mode == Mode.SELECT
@@ -295,6 +315,20 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 	
 	var mm := event as InputEventMouseMotion
 	if mm:
+		if mm.position.x >= canvas.get_end().x:
+			canvas.warp_mouse(Vector2(0, mm.position.y))
+			panning_from.x -= canvas.size.x
+		elif mm.position.x <= 0:
+			canvas.warp_mouse(Vector2(canvas.size.x, mm.position.y))
+			panning_from.x += canvas.size.x
+		
+		if mm.position.y >= canvas.get_end().y:
+			canvas.warp_mouse(Vector2(mm.position.x, 0))
+			panning_from.y -= canvas.size.y
+		elif mm.position.y <= 0:
+			canvas.warp_mouse(Vector2(mm.position.x, canvas.size.y))
+			panning_from.y += canvas.size.y
+		
 		node_transform.position = panning_origin + (mm.position - panning_from)
 		connection_transform.position = node_transform.position
 
@@ -302,6 +336,11 @@ class MindGraph:
 	var name: String
 	var nodes: Array[Node]
 	var connections: Array[Node]
+	
+	var background_color := Color("29282e")
+	var selection_color := Color.WHITE
+	
+	signal changed
 	
 	func _to_string() -> String:
 		return "MindGraph@%s" % name

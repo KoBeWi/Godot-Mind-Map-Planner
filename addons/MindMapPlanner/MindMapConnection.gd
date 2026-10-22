@@ -9,6 +9,7 @@ enum Style { CONTINUOUS, DASHED, DOTTED }
 var label: Label
 @onready var label_pivot: Node2D = %LabelPivot
 @onready var input_handler: Control = %InputHandler
+var graph
 
 var draw_selection: bool
 
@@ -133,7 +134,7 @@ func _draw() -> void:
 	if not draw_selection:
 		return
 	
-	var selection_color := Color.WHITE
+	var selection_color: Color = graph.selection_color
 	
 	var dir := point1.direction_to(point2)
 	point1 += dir * 48
