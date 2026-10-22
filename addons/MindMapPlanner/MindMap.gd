@@ -2,8 +2,10 @@
 extends EditorDock
 
 enum Mode { SELECT, RECONNECT, STYLE }
+enum NewFlags { CONNECT_TO_LAST = 1, COPY_LAST_STYLE = 2 }
 
 @export var tool_group: ButtonGroup
+@onready var new_options: MenuButton = %NewOptions
 
 @onready var graph_select: OptionButton = %GraphSelect
 @onready var graph_dialog: AcceptDialog = %GraphDialog
@@ -18,6 +20,7 @@ enum Mode { SELECT, RECONNECT, STYLE }
 var save_shortcut: Shortcut
 
 var current_mode: int = Mode.SELECT
+var new_flags: int = 0
 
 var map_path: String
 var graphs: Array[MindGraph]
@@ -32,10 +35,10 @@ var selected_node: Control:
 			return
 		
 		if selected_node:
-			selected_node.draw_selection = false
-			selected_node.queue_redraw()
+			selected_node.unselect()
 		selected_node = sn
 		if selected_node:
+			last_selected = selected_node
 			selected_node.draw_selection = true
 			selected_node.queue_redraw()
 
@@ -51,6 +54,8 @@ var selected_connection: Node2D:
 		if selected_connection:
 			selected_connection.draw_selection = true
 			selected_connection.queue_redraw()
+
+var last_selected: Control
 
 func update_graph_list():
 	graph_select.clear()
@@ -152,6 +157,12 @@ func _ready() -> void:
 	
 	graph_dialog.load_graphs(graphs)
 	
+	var popup := new_options.get_popup()
+	popup.hide_on_checkable_item_selection = false
+	popup.set_item_tooltip(popup.get_item_index(NewFlags.CONNECT_TO_LAST), "If enabled, the new node will be connected to the last selected node.")
+	popup.set_item_tooltip(popup.get_item_index(NewFlags.COPY_LAST_STYLE), "If enabled, the new node will copy the style of last selected node.")
+	popup.index_pressed.connect(_on_new_flag_toggled)
+	
 	set_active_graph(graphs[0])
 	update_graph_list()
 
@@ -181,11 +192,16 @@ func _on_add_node() -> void:
 	active_graph.nodes.append(node)
 	node_transform.add_child(node)
 	
-	if node_transform.get_child_count() > 1:
-		var previous := node_transform.get_child(-2)
-		var connection := create_connection(previous, node)
+	if new_flags & NewFlags.CONNECT_TO_LAST and last_selected:
+		var connection := create_connection(last_selected, node)
 		active_graph.connections.append(connection)
 		connection_transform.add_child(connection)
+	
+	if new_flags & NewFlags.COPY_LAST_STYLE and last_selected:
+		node.copy_style(last_selected)
+	
+	tool_group.get_buttons()[Mode.SELECT].press()
+	_on_node_selected(node)
 
 func _manage_graphs() -> void:
 	graph_dialog.popup_centered()
@@ -242,6 +258,17 @@ func _attempt_connection(to_node: Control):
 	var connection := create_connection(selected_node, to_node)
 	active_graph.connections.append(connection)
 	connection_transform.add_child(connection)
+
+func _on_new_flag_toggled(idx: int):
+	var popup := new_options.get_popup()
+	var pressed := not popup.is_item_checked(idx)
+	popup.set_item_checked(idx, pressed)
+	
+	var flag := popup.get_item_id(idx)
+	if pressed:
+		new_flags |= flag
+	else:
+		new_flags ^= flag
 
 func _can_edit() -> bool:
 	return current_mode == Mode.SELECT

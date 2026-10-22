@@ -39,6 +39,7 @@ var dragging_origin: Vector2
 var dragging_active: bool
 var rounded_sb: StyleBoxFlat
 
+var last_text: String
 var line_edit_dirty := true
 var try_select: bool
 
@@ -114,6 +115,13 @@ func get_tangent_point(direction: Vector2) -> Vector2:
 			return direction * radius
 	
 	return Vector2()
+
+func unselect():
+	draw_selection = false
+	if line_edit.is_editing():
+		line_edit.unedit()
+		_end_edit(true)
+	queue_redraw()
 
 func _get_rect_intersection(extents: Vector2, direction: Vector2) -> Vector2:
 			var x := 0
@@ -262,14 +270,16 @@ func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:
 		return
 	
-	if accepted:
-		label.text = line_edit.text
+	if not accepted:
+		label.text = last_text
 	
 	label.modulate.a = 1
 	line_edit.hide()
 
 func _on_line_edit_editing_toggled(toggled_on: bool) -> void:
-	if not toggled_on:
+	if toggled_on:
+		last_text = label.text
+	else:
 		_end_edit(not Input.is_action_pressed(&"ui_cancel"))
 
 func _on_line_edit_text_changed(new_text: String) -> void:
