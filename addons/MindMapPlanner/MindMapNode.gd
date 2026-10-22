@@ -81,7 +81,41 @@ func copy_style(from: Control):
 func get_tangent_point(direction: Vector2) -> Vector2:
 	match shape:
 		Shape.RECT, Shape.ROUND_RECT:
-			var extents := size * 0.5
+			return _get_rect_intersection(size * 0.5, direction)
+		
+		Shape.PARRALLELOGRAM:
+			# TODO
+			return _get_rect_intersection(size * 0.5, direction)
+		
+		Shape.RHOMB:
+			var center_shift := size * 0.5
+			var polygon: PackedVector2Array = [
+				Vector2(-node_size, size.y * 0.5) - center_shift,
+				Vector2(size.x * 0.5, -node_size - size.x * 0.2) - center_shift,
+				Vector2(size.x + node_size, size.y * 0.5) - center_shift,
+				Vector2(size.x * 0.5, size.y + node_size + size.x * 0.2) - center_shift
+			]
+			
+			if direction.x < 0 and direction.y > 0:
+				return Geometry2D.line_intersects_line(Vector2(), direction, polygon[0], (polygon[3] - polygon[0]).normalized())
+			elif direction.x < 0 and direction.y < 0:
+				return Geometry2D.line_intersects_line(Vector2(), direction, polygon[0], (polygon[1] - polygon[0]).normalized())
+			elif direction.x > 0 and direction.y < 0:
+				return Geometry2D.line_intersects_line(Vector2(), direction, polygon[2], (polygon[1] - polygon[2]).normalized())
+			elif direction.x > 0 and direction.y > 0:
+				return Geometry2D.line_intersects_line(Vector2(), direction, polygon[2], (polygon[3] - polygon[2]).normalized())
+		
+		Shape.OVAL:
+			# TODO
+			return _get_rect_intersection(Vector2(size.x, size.y + size.x * 0.2) * 0.5, direction)
+		
+		Shape.CIRCLE:
+			var radius := maxf(size.x, size.y) * 0.5
+			return direction * radius
+	
+	return Vector2()
+
+func _get_rect_intersection(extents: Vector2, direction: Vector2) -> Vector2:
 			var x := 0
 			var y := 0
 			
@@ -97,20 +131,6 @@ func get_tangent_point(direction: Vector2) -> Vector2:
 			
 			return Vector2(clampf(x, -extents.x, extents.x), clampf(y, -extents.y, extents.y))
 		
-		Shape.PARRALLELOGRAM:
-			pass
-		
-		Shape.RHOMB:
-			pass
-		
-		Shape.OVAL:
-			pass
-		
-		Shape.CIRCLE:
-			var radius := maxf(size.x, size.y) * 0.5
-			return direction * radius
-	
-	return Vector2()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_SCENE_INSTANTIATED:
