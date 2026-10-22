@@ -149,16 +149,16 @@ func _ready() -> void:
 			
 			for node_data in graph["nodes"]:
 				var node := create_node()
-				node.set_data(node_data)
 				node.graph = mind_graph
+				node.set_data(node_data)
 				mind_graph.nodes.append(node)
 			
 			for connection_data in graph["connections"]:
 				var node1 := mind_graph.nodes[connection_data["node1"]]
 				var node2 := mind_graph.nodes[connection_data["node2"]]
 				var connection := create_connection(node1, node2)
-				connection.set_data(connection_data)
 				connection.graph = mind_graph
+				connection.set_data(connection_data)
 				mind_graph.connections.append(connection)
 			
 			graphs.append(mind_graph)
@@ -179,7 +179,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	
 	if save_shortcut.matches_event(event):
-		save_map() ## TODO uncomment
+		save_map()
 		EditorInterface.get_editor_toaster().push_toast("MindMap saved.")
 		accept_event()
 
@@ -337,10 +337,22 @@ class MindGraph:
 	var nodes: Array[Node]
 	var connections: Array[Node]
 	
+	var default_node: Control
+	var default_connection: Node2D
+	
 	var background_color := Color("29282e")
 	var selection_color := Color.WHITE
 	
 	signal changed
+	
+	func _init() -> void:
+		default_node = preload("uid://c3hsdtwaq6jig").instantiate()
+		default_node.hide()
+		EditorInterface.get_base_control().add_child(default_node)
+		
+		default_connection = preload("uid://b64kn0iru4hto").instantiate()
+		default_connection.hide()
+		EditorInterface.get_base_control().add_child(default_connection)
 	
 	func _to_string() -> String:
 		return "MindGraph@%s" % name

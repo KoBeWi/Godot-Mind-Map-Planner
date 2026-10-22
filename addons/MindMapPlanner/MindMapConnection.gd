@@ -33,23 +33,30 @@ func get_data() -> Dictionary:
 	var data: Dictionary
 	data.node1 = node1.get_index()
 	data.node2 = node2.get_index()
-	data.text = label.text
-	data.text_color = text_color.to_html(false)
-	data.color = color.to_html(false)
-	data.end1 = end1
-	data.end2 = end2
-	data.style = style
-	data.thickness = thickness
+	if not label.text.is_empty():
+		data.text = label.text
+	if not text_color.is_equal_approx(graph.default_connection.text_color):
+		data.text_color = text_color.to_html(false)
+	if not color.is_equal_approx(graph.default_connection.color):
+		data.color = color.to_html(false)
+	if end1 != graph.default_connection.end1:
+		data.end1 = end1
+	if end2 != graph.default_connection.end2:
+		data.end2 = end2
+	if style != graph.default_connection.style:
+		data.style = style
+	if thickness != graph.default_connection.thickness:
+		data.thickness = thickness
 	return data
 
 func set_data(data: Dictionary) -> void:
-	label.text = data["text"]
-	text_color = data["text_color"]
-	color = data["color"]
-	end1 = data["end1"]
-	end2 = data["end2"]
-	style = data["style"]
-	thickness = data["thickness"]
+	label.text = data.get("text", "")
+	text_color = Color(data.get("text_color", graph.default_connection.text_color))
+	color = Color(data.get("color", graph.default_connection.color))
+	end1 = data.get("end1", graph.default_connection.end1)
+	end2 = data.get("end2", graph.default_connection.end2)
+	style = data.get("style", graph.default_connection.style)
+	thickness = data.get("thickness", graph.default_connection.thickness)
 
 func draw_end_texture(frame: int, pos: Vector2, rot: float):
 	const END_TEXTURE = preload("uid://rcg0kx1eexub")
@@ -65,7 +72,7 @@ func get_texture_scale() -> float:
 	return 0.25 + thickness * (0.05 * 0.75)
 
 func _ready() -> void:
-	if not is_part_of_edited_scene():
+	if not is_part_of_edited_scene() and node1:
 		node1.changed.connect(queue_redraw)
 		node1.draw.connect(queue_redraw)
 		node2.changed.connect(queue_redraw)

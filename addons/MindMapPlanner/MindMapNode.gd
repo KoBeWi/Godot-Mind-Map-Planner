@@ -50,24 +50,30 @@ signal changed
 func get_data() -> Dictionary:
 	var data: Dictionary
 	data.position = position + size * 0.5
-	data.text = label.text
-	data.text_color = text_color.to_html(false)
-	data.color = color.to_html(false)
-	data.border_color = border_color.to_html(false)
-	data.shape = shape
-	data.size = node_size
+	if not label.text.is_empty():
+		data.text = label.text
+	if not text_color.is_equal_approx(graph.default_node.text_color):
+		data.text_color = text_color.to_html(false)
+	if not color.is_equal_approx(graph.default_node.color):
+		data.color = color.to_html(false)
+	if not border_color.is_equal_approx(graph.default_node.border_color):
+		data.border_color = border_color.to_html(false)
+	if shape != graph.default_node.shape:
+		data.shape = shape
+	if node_size != graph.default_node.node_size:
+		data.size = node_size
 	return data
 
 func set_data(data: Dictionary) -> void:
 	var pos: String = data["position"].substr(1)
 	position.x = pos.get_slice(",", 0).to_float()
 	position.y = pos.get_slice(",", 1).to_float()
-	label.text = data["text"]
-	text_color = Color(data["text_color"])
-	color = Color(data["color"])
-	border_color = Color(data["border_color"])
-	shape = data["shape"]
-	node_size = data["size"]
+	label.text = data.get("text", "")
+	text_color = Color(data.get("text_color", graph.default_node.text_color))
+	color = Color(data.get("color", graph.default_node.color))
+	border_color = Color(data.get("border_color", graph.default_node.border_color))
+	shape = data.get("shape", graph.default_node.shape)
+	node_size = data.get("size", graph.default_node.node_size)
 	
 	reset_size()
 
