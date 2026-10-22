@@ -3,7 +3,7 @@ extends "ExtendedEditorPlugin.gd"
 
 const PATH_SETTING = "addons/mind_map_planner/mind_map_file"
 
-var dock: EditorDock
+var dock: MindMap.MindDock
 
 func _init() -> void:
 	track_project_setting(PATH_SETTING)
@@ -19,6 +19,14 @@ func _exit_tree() -> void:
 func _on_setting_changed(setting: String, new_value: Variant) -> void:
 	dock.map_path = new_value
 
-func _apply_changes() -> void:
-	pass # TODO uncomment
-	#dock.save_map()
+func _save_external_data() -> void:
+	dock.save_map()
+
+func _get_unsaved_status(for_scene: String) -> String:
+	if not for_scene.is_empty():
+		return ""
+	
+	if dock.undo_redo.get_version() != dock.last_saved_version:
+		return "MindMap has unsaved changed."
+	
+	return ""

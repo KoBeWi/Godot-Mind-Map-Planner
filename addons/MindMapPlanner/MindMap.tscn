@@ -29,6 +29,10 @@ icon_name = &"ToolConnect"
 script = ExtResource("1_54pab")
 icon_name = &"ThemeDock"
 
+[sub_resource type="ImageTexture" id="ImageTexture_314te"]
+script = ExtResource("1_54pab")
+icon_name = &"CenterView"
+
 [sub_resource type="ImageTexture" id="ImageTexture_s5850"]
 script = ExtResource("1_54pab")
 icon_name = &"Edit"
@@ -59,6 +63,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_vertical = 3
+layout_key = "MindMap"
 icon_name = &"AtlasTexture"
 default_slot = 11
 available_layouts = 14
@@ -127,9 +132,21 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_hednn")
 icon = SubResource("ImageTexture_r5hdv")
 
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer" unique_id=1576077889]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button3" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=1831629247]
+layout_mode = 2
+tooltip_text = "Recenter view on the first node."
+icon = SubResource("ImageTexture_314te")
+
+[node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HBoxContainer" unique_id=556223088]
+layout_mode = 2
+
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=1529592123]
 layout_mode = 2
-size_flags_horizontal = 10
+size_flags_horizontal = 8
 theme_type_variation = &"HeaderSmall"
 text = "Graph:"
 
@@ -454,6 +471,7 @@ size_flags_vertical = 0
 icon = SubResource("ImageTexture_3smkc")
 
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_add_node"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Button3" to="." method="_recenter_view"]
 [connection signal="item_selected" from="VBoxContainer/HBoxContainer/GraphSelect" to="." method="_on_graph_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button2" to="." method="_manage_graphs"]
 [connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]

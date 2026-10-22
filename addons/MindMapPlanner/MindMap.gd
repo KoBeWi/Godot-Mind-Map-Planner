@@ -18,6 +18,8 @@ enum NewFlags { CONNECT_TO_LAST = 1, COPY_LAST_STYLE = 2 }
 @onready var node_settings: VBoxContainer = %NodeSettings
 @onready var connection_settings: VBoxContainer = %ConnectionSettings
 
+static var singleton: MindMap.MindDock
+
 var save_shortcut: Shortcut
 
 var current_mode: int = Mode.SELECT
@@ -29,6 +31,9 @@ var active_graph: MindGraph
 
 var panning_from := Vector2.INF
 var panning_origin: Vector2
+
+var undo_redo: UndoRedo
+var last_saved_version: int
 
 var selected_node: MindMap.MindNode:
 	set(sn):
@@ -57,6 +62,24 @@ var selected_connection: MindMap.MindConnection:
 			selected_connection.queue_redraw()
 
 var last_selected: MindMap.MindNode
+
+func _init() -> void:
+	if not is_part_of_edited_scene():
+		undo_redo = UndoRedo.new()
+		undo_redo.version_changed.connect(update_tile)
+		singleton = self
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		if singleton == self:
+			undo_redo.free()
+			singleton = null
+
+func update_tile():
+	if last_saved_version == undo_redo.get_version():
+		title = "MindMap"
+	else:
+		title = "MindMap(*)"
 
 func update_graph_list():
 	graph_select.clear()
@@ -107,9 +130,6 @@ func set_active_settings(settings: Control):
 func save_map():
 	var data: Array[Dictionary]
 	
-	for index in 10:
-		print(index)
-	
 	for graph in graphs:
 		var graph_data: Dictionary[String, Variant]
 		graph_data["name"] = graph.name
@@ -130,6 +150,9 @@ func save_map():
 	
 	var file := FileAccess.open(map_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(data, "	", false))
+	
+	last_saved_version = undo_redo.get_version()
+	update_tile()
 
 func _ready() -> void:
 	if is_part_of_edited_scene():
@@ -187,6 +210,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		save_map()
 		EditorInterface.get_editor_toaster().push_toast("MindMap saved.")
 		accept_event()
+	elif event.is_action(&"ui_undo", true):
+		print("aaaA")
+		accept_event()
+
+func _gui_input(event: InputEvent) -> void:
+	print("aaa")
 
 func _on_tool_changed(tool: Button) -> void:
 	current_mode = tool.get_index()
@@ -336,6 +365,17 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 		
 		node_transform.position = panning_origin + (mm.position - panning_from)
 		connection_transform.position = node_transform.position
+
+func _recenter_view() -> void:
+	var center := Vector2()
+	if not active_graph.nodes.is_empty():
+		var center_node := active_graph.nodes[0]
+		center = center_node.position + center_node.size * 0.5
+		print(center)
+	
+	center -= canvas.size * 0.5
+	node_transform.position = -center
+	connection_transform.position = -center
 
 class MindGraph:
 	var name: String
