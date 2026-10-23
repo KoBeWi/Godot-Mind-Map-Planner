@@ -24,6 +24,7 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED:
 		if not visible:
+			_close_settings()
 			graph_list.deselect_all()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -41,7 +42,7 @@ func load_graphs(graph_list: Array[MindMap.MindGraph]):
 	for graph in graphs:
 		create_graph_item(graph.name)
 	
-func create_graph_item(text: String):
+func create_graph_item(text: String) -> TreeItem:
 	var graph_item := graph_list.create_item()
 	graph_item.set_text(0, text)
 	graph_item.set_editable(0, true)
@@ -51,16 +52,40 @@ func create_graph_item(text: String):
 	if graphs.size() > 1:
 		graph_item.add_button(0, get_theme_icon(&"Remove", &"EditorIcons"), ButtonID.REMOVE_GRAPH)
 		graph_item.set_button_tooltip_text(0, -1, "Remove graph.")
+	
+	return graph_item
 
 func reload_graphs():
 	graph_list.clear()
 	graph_list.create_item()
 	
 	for graph in graphs:
-		create_graph_item(graph.name)
+		var item := create_graph_item(graph.name)
+		if graph == edited_graph:
+			item.set_custom_color(0, get_theme_color(&"accent_color", &"Editor"))
 	
 	if not visible:
 		MindMap.MindDock.singleton.update_graph_list()
+
+func update_properties_for_graph(graph: MindMap.MindGraph):
+	if graph != edited_graph:
+		return
+	graph_name.text = graph.name
+	background_color.color = graph.background_color
+	selection_color.color = graph.selection_color
+
+func set_graph_property(property: StringName, new_value: Variant):
+	var graph := edited_graph
+	
+	var undo_redo := MindMap.MindDock.singleton.undo_redo
+	undo_redo.create_action(tr("Graph Set: %s") % property, UndoRedo.MERGE_ENDS)
+	undo_redo.add_do_property(edited_graph, property, new_value)
+	undo_redo.add_do_method(update_properties_for_graph.bind(edited_graph))
+	undo_redo.add_do_method(func(): graph_changed.emit(graph))
+	undo_redo.add_undo_property(edited_graph, property, edited_graph.get(property))
+	undo_redo.add_undo_method(update_properties_for_graph.bind(edited_graph))
+	undo_redo.add_undo_method(func(): graph_changed.emit(graph))
+	undo_redo.commit_action()
 
 func _add_graph() -> void:
 	var graph := MindMap.MindGraph.new()
@@ -94,9 +119,7 @@ func _on_graph_list_button_clicked(item: TreeItem, column: int, id: int, mouse_b
 			edited_graph = graphs[item.get_index()]
 			item.set_custom_color(0, get_theme_color(&"accent_color", &"Editor"))
 			
-			graph_name.text = edited_graph.name
-			background_color.color = edited_graph.background_color
-			selection_color.color = edited_graph.selection_color
+			update_properties_for_graph(edited_graph)
 			
 			graph_options.show()
 		
@@ -127,25 +150,58 @@ func _on_graph_list_reordered(from: int, to: int) -> void:
 	var graph := graphs[from]
 	graphs.remove_at(from)
 	graphs.insert(to, graph)
+	
+	var undo_redo := MindMap.MindDock.singleton.undo_redo
+	undo_redo.create_action("Reorder Graphs")
+	undo_redo.add_do_method(func():
+		graphs.remove_at(from)
+		graphs.insert(to, graph))
+	undo_redo.add_do_method(reload_graphs)
+	undo_redo.add_undo_method(func():
+		graphs.remove_at(to)
+		graphs.insert(from, graph))
+	undo_redo.add_undo_method(reload_graphs)
+	undo_redo.commit_action(false)
 
 func _on_graph_list_item_edited() -> void:
 	var item := graph_list.get_edited()
 	if item:
-		graphs[item.get_index()].name = item.get_text(0)
+		var graph := graphs[item.get_index()]
+		var old_name := graph.name
+		var new_name := item.get_text(0)
+		graph.name = new_name
+		
+		var undo_redo := MindMap.MindDock.singleton.undo_redo
+		undo_redo.create_action("Rename Graph")
+		undo_redo.add_do_property(graph, &"name", new_name)
+		undo_redo.add_do_method(reload_graphs)
+		undo_redo.add_undo_property(graph, &"name", old_name)
+		undo_redo.add_undo_method(reload_graphs)
+		undo_redo.commit_action(false)
 
 func _on_graph_name_text_changed(new_text: String) -> void:
+	var old_name := edited_graph.name
 	edited_graph.name = new_text
 	
 	var idx := graphs.find(edited_graph)
 	graph_list.get_root().get_child(idx).set_text(0, new_text)
+	
+	var graph := edited_graph
+	var undo_redo := MindMap.MindDock.singleton.undo_redo
+	undo_redo.create_action("Rename Graph", UndoRedo.MERGE_ENDS)
+	undo_redo.add_do_property(graph, &"name", new_text)
+	undo_redo.add_do_method(update_properties_for_graph.bind(graph))
+	undo_redo.add_do_method(reload_graphs)
+	undo_redo.add_undo_property(graph, &"name", old_name)
+	undo_redo.add_undo_method(update_properties_for_graph.bind(graph))
+	undo_redo.add_undo_method(reload_graphs)
+	undo_redo.commit_action(false)
 
 func _on_background_color_color_changed(color: Color) -> void:
-	edited_graph.background_color = color
-	graph_changed.emit(edited_graph)
+	set_graph_property(&"background_color", color)
 
 func _on_selection_color_color_changed(color: Color) -> void:
-	edited_graph.selection_color = color
-	graph_changed.emit(edited_graph)
+	set_graph_property(&"selection_color", color)
 
 func _close_settings() -> void:
 	var idx := graphs.find(edited_graph)
