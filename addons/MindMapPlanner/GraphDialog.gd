@@ -26,6 +26,16 @@ func _notification(what: int) -> void:
 		if not visible:
 			graph_list.deselect_all()
 
+func _unhandled_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k and k.pressed:
+		if k.is_action(&"ui_undo", true):
+			if MindMap.MindDock.singleton.undo():
+				set_input_as_handled()
+		elif k.is_action(&"ui_redo", true):
+			if MindMap.MindDock.singleton.redo():
+				set_input_as_handled()
+
 func load_graphs(graph_list: Array[MindMap.MindGraph]):
 	graphs = graph_list
 	for graph in graphs:
@@ -37,15 +47,40 @@ func create_graph_item(text: String):
 	graph_item.set_editable(0, true)
 	graph_item.add_button(0, get_theme_icon(&"Edit", &"EditorIcons"), ButtonID.EDIT_GRAPH)
 	graph_item.set_button_tooltip_text(0, -1, "Edit graph properties.")
-	graph_item.add_button(0, get_theme_icon(&"Remove", &"EditorIcons"), ButtonID.REMOVE_GRAPH)
-	graph_item.set_button_tooltip_text(0, -1, "Remove graph.")
+	
+	if graphs.size() > 1:
+		graph_item.add_button(0, get_theme_icon(&"Remove", &"EditorIcons"), ButtonID.REMOVE_GRAPH)
+		graph_item.set_button_tooltip_text(0, -1, "Remove graph.")
+
+func reload_graphs():
+	graph_list.clear()
+	graph_list.create_item()
+	
+	for graph in graphs:
+		create_graph_item(graph.name)
+	
+	if not visible:
+		MindMap.MindDock.singleton.update_graph_list()
 
 func _add_graph() -> void:
 	var graph := MindMap.MindGraph.new()
 	graph.name = "New Graph"
 	graphs.append(graph)
-	
 	create_graph_item(graph.name)
+	
+	if graphs.size() == 2:
+		reload_graphs()
+	
+	var undo_redo := MindMap.MindDock.singleton.undo_redo
+	undo_redo.create_action("Add Graph")
+	#undo_redo.add_do_method(graphs.append.bind(graph))
+	undo_redo.add_do_method(func(): graphs.append(graph))
+	undo_redo.add_do_method(reload_graphs)
+	undo_redo.add_do_reference(graph)
+	#undo_redo.add_undo_method(graphs.erase.bind(graph))
+	undo_redo.add_undo_method(func(): graphs.erase(graph))
+	undo_redo.add_undo_method(reload_graphs)
+	undo_redo.commit_action(false)
 
 func _on_graph_list_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int) -> void:
 	if mouse_button_index != MOUSE_BUTTON_LEFT:
@@ -70,8 +105,23 @@ func _on_graph_list_button_clicked(item: TreeItem, column: int, id: int, mouse_b
 			if graph == edited_graph:
 				_close_settings()
 			
-			graphs.remove_at(item.get_index())
+			var index := item.get_index()
+			graphs.remove_at(index)
 			item.free()
+			
+			if graphs.size() == 1:
+				reload_graphs()
+			
+			var undo_redo := MindMap.MindDock.singleton.undo_redo
+			undo_redo.create_action("Remove Graph")
+			#undo_redo.add_do_method(graphs.append.bind(graph))
+			undo_redo.add_do_method(func(): graphs.remove_at(index))
+			undo_redo.add_do_method(reload_graphs)
+			#undo_redo.add_undo_method(graphs.erase.bind(graph))
+			undo_redo.add_undo_method(func(): graphs.insert(index, graph))
+			undo_redo.add_undo_method(reload_graphs)
+			undo_redo.add_undo_reference(graph)
+			undo_redo.commit_action(false)
 
 func _on_graph_list_reordered(from: int, to: int) -> void:
 	var graph := graphs[from]

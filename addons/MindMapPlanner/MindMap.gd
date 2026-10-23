@@ -33,7 +33,7 @@ var panning_from := Vector2.INF
 var panning_origin: Vector2
 
 var undo_redo: UndoRedo
-var last_saved_version: int
+var last_saved_version := 1
 
 var selected_node: MindMap.MindNode:
 	set(sn):
@@ -63,8 +63,8 @@ var selected_connection: MindMap.MindConnection:
 
 var last_selected: MindMap.MindNode
 
-func _init() -> void:
-	if not is_part_of_edited_scene():
+func _enter_tree() -> void:
+	if not is_part_of_edited_scene() and not undo_redo:
 		undo_redo = UndoRedo.new()
 		undo_redo.version_changed.connect(update_tile)
 		singleton = self
@@ -81,13 +81,17 @@ func update_tile():
 	else:
 		title = "MindMap(*)"
 
-func update_graph_list():
+func update_graph_list() -> bool:
 	graph_select.clear()
 	
+	var found_current: bool
 	for graph in graphs:
 		graph_select.add_item(graph.name)
 		if graph == active_graph:
+			found_current = true
 			graph_select.select(graph_select.item_count - 1)
+	
+	return found_current
 
 func set_active_graph(graph: MindGraph):
 	for node in node_transform.get_children():
@@ -154,6 +158,20 @@ func save_map():
 	last_saved_version = undo_redo.get_version()
 	update_tile()
 
+func undo() -> bool:
+	if undo_redo.has_undo():
+		var action_name := undo_redo.get_current_action_name()
+		undo_redo.undo()
+		print(tr("MindMap undo: %s") % action_name)
+		return true
+	return false
+
+func redo() -> bool:
+	if undo_redo.redo():
+		print(tr("MindMap redo: %s") % undo_redo.get_current_action_name())
+		return true
+	return false
+
 func _ready() -> void:
 	if is_part_of_edited_scene():
 		return
@@ -217,8 +235,18 @@ func _on_add_node() -> void:
 	var node := create_node()
 	node.position = -node_transform.position + size * 0.5 - node.size * 0.5
 	node.graph = active_graph
-	active_graph.nodes.append(node)
-	node_transform.add_child(node)
+	
+	var graph := active_graph
+	
+	undo_redo.create_action("Add Node")
+	undo_redo.add_do_method(func():
+		graph.nodes.append(node)
+		node_transform.add_child(node))
+	undo_redo.add_undo_method(func():
+		graph.nodes.erase(node)
+		node_transform.remove_child(node))
+	undo_redo.add_do_reference(node)
+	undo_redo.commit_action()
 	
 	if new_flags & NewFlags.CONNECT_TO_LAST and last_selected:
 		var connection := create_connection(last_selected, node)
@@ -238,7 +266,8 @@ func _manage_graphs() -> void:
 func _on_graph_dialog_visibility_changed() -> void:
 	if not graph_dialog or graph_dialog.visible:
 		return
-	update_graph_list()
+	if not update_graph_list():
+		set_active_graph(graphs[0])
 
 func _on_graph_selected(index: int) -> void:
 	set_active_graph(graphs[index])
@@ -344,12 +373,10 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 				selected_connection.queue_free()
 				accept_event()
 		elif event.is_action(&"ui_undo", true):
-			if undo_redo.undo():
-				print("MindMap undo")
+			if undo():
 				accept_event()
 		elif event.is_action(&"ui_redo", true):
-			if undo_redo.redo():
-				print("MindMap redo")
+			if redo():
 				accept_event()
 		
 		return

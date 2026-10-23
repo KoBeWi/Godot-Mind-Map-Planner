@@ -30,14 +30,14 @@ func _drop_data(at_position: Vector2, data: Variant) -> void:
 	if not target_item:
 		return
 	
+	var section := maxi(get_drop_section_at_position(at_position), 0)
 	var source_index: int = data["index"]
-	var drop_index := target_item.get_index()
-	if source_index == drop_index:
-		return
 	
-	if drop_index == 0:
-		get_root().get_child(source_index).move_before(target_item)
+	var moved_child := get_root().get_child(source_index)
+	if section == 0:
+		moved_child.move_before(target_item)
 	else:
-		get_root().get_child(source_index).move_after(target_item)
+		moved_child.move_after(target_item)
 	
-	reordered.emit(source_index, drop_index)
+	if moved_child.get_index() != source_index:
+		reordered.emit(source_index, moved_child.get_index())

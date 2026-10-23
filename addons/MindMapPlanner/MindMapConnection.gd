@@ -29,8 +29,8 @@ signal selected
 
 func get_data() -> Dictionary:
 	var data: Dictionary
-	data.node1 = node1.get_index()
-	data.node2 = node2.get_index()
+	data.node1 = graph.nodes.find(node1)
+	data.node2 = graph.nodes.find(node2)
 	if not label.text.is_empty():
 		data.text = label.text
 	if not text_color.is_equal_approx(graph.default_connection.text_color):
