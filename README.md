@@ -1,5 +1,5 @@
 # <img src="Media/Icon.png" width="64" height="64"> Godot Mind Map Planner
-This plugin allows you to create mind map graphs inside Godot. It's main use is for planning and mapping out ideas inside your project.
+This plugin allows you to create mind map graphs inside Godot. Its main use is for planning and mapping out ideas inside your project.
 
 ![](Media/PromoGraph.webp)
 
