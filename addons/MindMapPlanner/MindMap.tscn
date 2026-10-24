@@ -477,7 +477,7 @@ icon = SubResource("ImageTexture_3smkc")
 [connection signal="item_selected" from="VBoxContainer/HBoxContainer/GraphSelect" to="." method="_on_graph_selected"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Button2" to="." method="_manage_graphs"]
 [connection signal="gui_input" from="VBoxContainer/Canvas" to="." method="_on_canvas_gui_input"]
-[connection signal="mouse_entered" from="VBoxContainer/Canvas" to="VBoxContainer/Canvas" method="grab_focus"]
+[connection signal="mouse_entered" from="VBoxContainer/Canvas" to="." method="_on_canvas_mouse_entered"]
 [connection signal="text_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/TextEdit" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_text_edit_text_changed"]
 [connection signal="item_selected" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/ShapeButton" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_shape_button_item_selected"]
 [connection signal="color_changed" from="VBoxContainer/Canvas/SettingContainer/NodeSettings/GridContainer/NodeColor" to="VBoxContainer/Canvas/SettingContainer/NodeSettings" method="_on_node_color_color_changed"]

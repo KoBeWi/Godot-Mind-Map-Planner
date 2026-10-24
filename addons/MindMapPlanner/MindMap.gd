@@ -341,6 +341,13 @@ func _on_graph_dialog_graph_changed(graph: MindGraph) -> void:
 func _can_edit() -> bool:
 	return current_mode == Mode.SELECT
 
+func _on_canvas_mouse_entered() -> void:
+	var current_focus := get_viewport().gui_get_focus_owner()
+	if current_focus is LineEdit and current_focus.is_editing():
+		return
+	
+	canvas.grab_focus()
+
 func _on_canvas_gui_input(event: InputEvent) -> void:
 	var k := event as InputEventKey
 	if k and k.pressed:
