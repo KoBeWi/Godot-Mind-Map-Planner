@@ -87,6 +87,19 @@ func set_data(data: Dictionary) -> void:
 	
 	reset_size()
 
+func set_style_data(data: Dictionary):
+	var defaults := graph.default_node
+	
+	label.text = data.get("text", "")
+	text_color = Color(data.get("text_color", defaults.text_color))
+	color = Color(data.get("color", defaults.color))
+	border_color = Color(data.get("border_color", defaults.border_color))
+	shape = data.get("shape", defaults.shape)
+	node_size = data.get("size", defaults.node_size)
+	
+	reset_size()
+	queue_redraw()
+
 func copy_style(from: MindMap.MindNode):
 	text_color = from.text_color
 	color = from.color
@@ -186,7 +199,7 @@ func _gui_input(event: InputEvent) -> void:
 						dragging_origin = position
 					selected.emit()
 			elif not mb.pressed:
-				if not position.is_equal_approx(dragging_origin):
+				if dragging_active:
 					var undo_redo := MindMap.MindDock.singleton.undo_redo
 					undo_redo.create_action("Move Node")
 					undo_redo.add_do_property(self, &"position", position)
@@ -289,6 +302,9 @@ func _draw() -> void:
 			
 			if draw_selection:
 				draw_rect(Rect2(polygon[0].x - 8, polygon[1].y - 8, polygon[2].x - polygon[0].x + 16, polygon[3].y - polygon[1].y + 16), selection_color, false)
+
+func _to_string() -> String:
+	return "MindNode@%s" % text
 
 func _end_edit(accepted := true) -> void:
 	if not line_edit.visible:

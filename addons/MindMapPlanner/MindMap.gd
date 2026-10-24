@@ -126,6 +126,37 @@ func create_connection(node1: MindMap.MindNode, node2: MindMap.MindNode) -> Mind
 	connection.selected.connect(_on_connection_selected.bind(connection))
 	return connection
 
+func add_connection(connection: MindMap.MindConnection):
+	var graph := active_graph
+	
+	undo_redo.create_action("Add Connection")
+	undo_redo.add_do_method(func():
+		graph.connections.append(connection)
+		if graph == active_graph:
+			connection_transform.add_child(connection))
+	undo_redo.add_undo_method(func():
+		graph.connections.erase(connection)
+		if graph == active_graph:
+			connection_transform.remove_child(connection))
+	undo_redo.add_do_reference(connection)
+	undo_redo.commit_action()
+
+func remove_connection(connection: MindMap.MindConnection):
+	var graph := active_graph
+	var index := graph.connections.find(connection)
+	
+	undo_redo.create_action("Remove Connection")
+	undo_redo.add_do_method(func():
+		graph.connections.erase(connection)
+		if graph == active_graph:
+			connection_transform.remove_child(connection))
+	undo_redo.add_undo_method(func():
+		graph.connections.insert(index, connection)
+		if graph == active_graph:
+			connection_transform.add_child(connection))
+	undo_redo.add_undo_reference(connection)
+	undo_redo.commit_action()
+
 func set_active_settings(settings: Control):
 	node_settings.visible = settings == node_settings
 	connection_settings.visible = settings == connection_settings
@@ -235,27 +266,28 @@ func _on_add_node() -> void:
 	var node := create_node()
 	node.position = -node_transform.position + size * 0.5 - node.size * 0.5
 	node.graph = active_graph
+	if new_flags & NewFlags.COPY_LAST_STYLE and last_selected:
+		node.copy_style(last_selected)
 	
 	var graph := active_graph
 	
 	undo_redo.create_action("Add Node")
 	undo_redo.add_do_method(func():
 		graph.nodes.append(node)
-		node_transform.add_child(node))
+		if graph == active_graph:
+			node_transform.add_child(node))
 	undo_redo.add_undo_method(func():
 		graph.nodes.erase(node)
-		node_transform.remove_child(node))
+		if graph == active_graph:
+			node_transform.remove_child(node))
 	undo_redo.add_do_reference(node)
-	undo_redo.commit_action()
 	
 	if new_flags & NewFlags.CONNECT_TO_LAST and last_selected:
 		var connection := create_connection(last_selected, node)
 		connection.graph = active_graph
-		active_graph.connections.append(connection)
-		connection_transform.add_child(connection)
+		add_connection(connection)
 	
-	if new_flags & NewFlags.COPY_LAST_STYLE and last_selected:
-		node.copy_style(last_selected)
+	undo_redo.commit_action()
 	
 	tool_group.get_buttons()[Mode.SELECT].press()
 	_on_node_selected(node)
@@ -272,7 +304,7 @@ func _on_graph_dialog_visibility_changed() -> void:
 func _on_graph_selected(index: int) -> void:
 	set_active_graph(graphs[index])
 
-func _on_node_selected(node: Control):
+func _on_node_selected(node: MindMap.MindNode):
 	if selected_node == node:
 		return
 	
@@ -283,7 +315,18 @@ func _on_node_selected(node: Control):
 				return
 			
 			Mode.STYLE:
+				var old_data := node.get_data()
 				node.copy_style(selected_node)
+				var new_data := node.get_data()
+				
+				if new_data == old_data:
+					return
+				
+				undo_redo.create_action("Copy Style")
+				undo_redo.add_do_method(node.set_style_data.bind(new_data))
+				undo_redo.add_undo_method(node.set_style_data.bind(old_data))
+				undo_redo.commit_action(false)
+				
 				return
 	
 	selected_node = node
@@ -295,7 +338,7 @@ func _on_node_selected(node: Control):
 	else:
 		set_active_settings(null)
 
-func _on_connection_selected(connection: Node2D):
+func _on_connection_selected(connection: MindMap.MindConnection):
 	if selected_connection == connection:
 		return
 	
@@ -310,13 +353,13 @@ func _attempt_connection(to_node: Control):
 	
 	for connection in connection_transform.get_children():
 		if (connection.node1 == selected_node and connection.node2 == to_node) or (connection.node1 == to_node and connection.node2 == selected_node):
-			connection.queue_free()
+			prints(connection.node1, connection.node2)
+			remove_connection(connection)
 			return
 	
 	var connection := create_connection(selected_node, to_node)
 	connection.graph = active_graph
-	active_graph.connections.append(connection)
-	connection_transform.add_child(connection)
+	add_connection(connection)
 
 func _on_new_flag_toggled(idx: int):
 	var popup := new_options.get_popup()
@@ -377,14 +420,16 @@ func _on_canvas_gui_input(event: InputEvent) -> void:
 				set_active_settings(null)
 				accept_event()
 			elif selected_connection:
-				selected_connection.queue_free()
+				remove_connection(selected_connection)
 				accept_event()
 		elif event.is_action(&"ui_undo", true):
-			if undo():
-				accept_event()
+			if not undo():
+				print("MindMap: Noting to undo.")
+			accept_event()
 		elif event.is_action(&"ui_redo", true):
-			if redo():
-				accept_event()
+			if not redo():
+				print("MindMap: Noting to redo.")
+			accept_event()
 		
 		return
 	
