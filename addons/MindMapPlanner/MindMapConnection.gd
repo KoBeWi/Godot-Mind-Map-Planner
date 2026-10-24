@@ -14,6 +14,12 @@ var draw_selection: bool
 var node1: MindMap.MindNode
 var node2: MindMap.MindNode
 
+var text: String:
+	set(t):
+		label.text = t
+	get:
+		return label.text
+
 var text_color := Color.WHITE:
 	set(tc):
 		text_color = tc

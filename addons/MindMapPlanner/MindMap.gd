@@ -266,7 +266,7 @@ func _manage_graphs() -> void:
 func _on_graph_dialog_visibility_changed() -> void:
 	if not graph_dialog or graph_dialog.visible:
 		return
-	if not update_graph_list():
+	if not graphs.is_empty() and not update_graph_list():
 		set_active_graph(graphs[0])
 
 func _on_graph_selected(index: int) -> void:

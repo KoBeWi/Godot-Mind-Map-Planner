@@ -24,7 +24,8 @@ func _ready() -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_VISIBILITY_CHANGED:
 		if not visible:
-			_close_settings()
+			if graph_options.visible:
+				_close_settings()
 			graph_list.deselect_all()
 
 func _unhandled_input(event: InputEvent) -> void:

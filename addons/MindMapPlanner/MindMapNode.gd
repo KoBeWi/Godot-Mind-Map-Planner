@@ -10,6 +10,12 @@ var graph: MindMap.MindGraph
 var check_edit: Callable
 var draw_selection: bool
 
+var text: String:
+	set(t):
+		label.text = t
+	get:
+		return label.text
+
 var shape := Shape.RECT
 var color := Color.WHITE:
 	set(c):
